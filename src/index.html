@@ -25,6 +25,30 @@
     </div>
     <button class="add-task-button">+</button>
   </nav>
+
+  <dialog class="task-dialog">
+    <form action="">
+      <a href="#" class="close-dialog-button"></a>
+      <div class="question-group">
+        <input type="text" name="title" placeholder="Title: Grocery" class="task-title-input">
+      </div>
+      <div class="question-group">
+        <input type="text" name="description" placeholder="Details: e.g. apple, milk, cucumber" class="task-description-input">
+      </div>
+      <div class="question-group">
+        <label for="date">Due Date:</label><input type="date" id="date" name="date" class="date-input">
+      </div>
+      <div class="question-group">
+        <label for="priority">Priority</label>
+        <select name="priority" id="priority">
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+      <input type="submit" class="task-submit-button">
+    </form>
+  </dialog>
   
   <div class="tasks-display"></div>
 
