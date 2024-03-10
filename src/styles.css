@@ -63,3 +63,22 @@ header {
 	bottom: 50px;
 	left: 50px;
 }
+
+.tasks-display {
+	padding: 3em;
+}
+
+.task-display-heading {
+	font-size: 2rem;
+}
+
+.task-item {
+	display: flex;
+	border: 1px solid;
+	padding: 0.5em;
+	gap: 1em;
+}
+
+.task-title {
+	flex: 1;
+}

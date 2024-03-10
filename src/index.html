@@ -5,6 +5,7 @@
   <meta charset="utf-8">
   <title>Todo List</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://kit.fontawesome.com/d03c42b712.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -14,9 +15,10 @@
   </header>
 
   <nav class="nav-bar">
-    <button class="nav-button">Inbox</button>
-    <button class="nav-button">Today</button>
-    <button class="nav-button">This week</button>
+    <button class="nav-button inbox">Inbox</button>
+    <button class="nav-button today">Today</button>
+    <button class="nav-button this-week">This week</button>
+    <button class="nav-button completed">Completed</button>
     <div class="project-holder">
       <div class="project-heading">
         <h2>Projects</h2>
@@ -27,7 +29,7 @@
   </nav>
 
   <dialog class="task-dialog">
-    <form action="">
+    <form action="" class="task-form">
       <a href="#" class="close-dialog-button"></a>
       <div class="question-group">
         <input type="text" name="title" placeholder="Title: Grocery" class="task-title-input">
@@ -36,11 +38,11 @@
         <input type="text" name="description" placeholder="Details: e.g. apple, milk, cucumber" class="task-description-input">
       </div>
       <div class="question-group">
-        <label for="date">Due Date:</label><input type="date" id="date" name="date" class="date-input">
+        <label for="date">Due Date:</label><input type="date" id="date" name="date" class="due-date-input">
       </div>
       <div class="question-group">
         <label for="priority">Priority</label>
-        <select name="priority" id="priority">
+        <select name="priority" id="priority" class="priority-input">
           <option value="low">Low</option>
           <option value="medium">Medium</option>
           <option value="high">High</option>
@@ -50,7 +52,11 @@
     </form>
   </dialog>
   
-  <div class="tasks-display"></div>
+  <div class="tasks-display">
+    <h2 class="task-display-heading">Inbox</h2>
+    <div class="tasks-container">
+    </div>
+  </div>
 
 </body>
 
