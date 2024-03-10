@@ -9,58 +9,15 @@ const taskDialog = document.querySelector('.task-dialog');
 const taskForm = document.querySelector('.task-form');
 const todayNavButton = document.querySelector('.today');
 const inboxNavButton = document.querySelector('.inbox');
+const thisWeekNavButton = document.querySelector('.this-week');
 const taskDisplayHeading = document.querySelector('.task-display-heading');
+let inbox = true;
+let today = false;
+let thisWeek = false;
 
-(function createEvents () {
+const displayController = (() => {
 
-    addTaskButton.addEventListener('click', () => {
-
-        taskDialog.showModal();
-
-});
-    
-    taskForm.addEventListener('submit',  event => {
-
-        event.preventDefault();
-
-        const taskTitleValue = document.querySelector('.task-title-input').value;
-        const taskDescriptionValue = document.querySelector('.task-description-input').value;
-        const dueDateValue = document.querySelector('.due-date-input').value;
-        const priorityValue = document.querySelector('.priority-input').value;
-        const newTask = taskManager.createTaskItem(taskTitleValue, taskDescriptionValue, dueDateValue, priorityValue);
-        const tasksArray = taskManager.getInboxTaskArray();
-
-        taskManager.addTaskItemToArray(newTask);
-        updateTasksDisplay(tasksArray);
-        taskDialog.close();
-        taskForm.reset();
-
-    })
-
-    inboxNavButton.addEventListener('click', () => {
-
-        const tasksArray = taskManager.getInboxTaskArray();
-
-        taskDisplayHeading.textContent = 'Inbox';
-        updateTasksDisplay(tasksArray);
-
-    })
-
-    todayNavButton.addEventListener('click', () => {
-
-        const tasksArray = taskManager.getInboxTaskArray();
-        const todayTasksArray = taskManager.getTodayTasksArray(tasksArray)
-
-        taskDisplayHeading.textContent = 'Today';
-        updateTasksDisplay(todayTasksArray);
-
-    })
-    
-})();
-
-// const displayController = 
-
-function updateTasksDisplay (array) {
+    function renderTasksDisplay (array) {
     
     const tasksContainer = document.querySelector('.tasks-container');
     tasksContainer.textContent = "";
@@ -84,5 +41,105 @@ function updateTasksDisplay (array) {
         tasksContainer.appendChild(taskItem);
 
     }
-
 }
+
+    function checkRenderingCondition (array) {
+
+        if (inbox) {
+
+            updateInboxTasksDisplay(array);
+
+        } else if (today) {
+
+            updateTodayTasksDisplay(array);
+
+        } else {
+
+            updateThisWeekTasksDisplay(array);
+
+        }
+
+    }
+
+    function updateInboxTasksDisplay () {
+
+        inbox = true;
+        today = false;
+        thisWeek = false;
+
+        const tasksArray = taskManager.getInboxTaskArray();
+
+        taskDisplayHeading.textContent = 'Inbox';
+        renderTasksDisplay(tasksArray);
+
+
+    }   
+
+    function updateTodayTasksDisplay () {
+
+        today = true;
+        inbox = false;
+        thisWeek = false;
+
+        const tasksArray = taskManager.getInboxTaskArray();
+        const todayTasksArray = taskManager.getTodayTasksArray(tasksArray)
+
+        taskDisplayHeading.textContent = 'Today';
+        renderTasksDisplay(todayTasksArray);
+
+    }
+
+    function updateThisWeekTasksDisplay () {
+
+        thisWeek = true;
+        today = false;
+        inbox = false;
+
+        const tasksArray = taskManager.getInboxTaskArray();
+        const thisWeekTasksArray = taskManager.getThisWeekTasksArray(tasksArray);
+
+        taskDisplayHeading.textContent = 'This Week';
+        renderTasksDisplay(thisWeekTasksArray);
+
+    }
+
+    return {renderTasksDisplay, updateInboxTasksDisplay, updateThisWeekTasksDisplay, updateTodayTasksDisplay, checkRenderingCondition};
+
+})();
+
+(function createEvents () {
+
+    addTaskButton.addEventListener('click', () => {
+
+        taskDialog.showModal();
+
+});
+    
+    taskForm.addEventListener('submit',  event => {
+
+        event.preventDefault();
+
+        const taskTitleValue = document.querySelector('.task-title-input').value;
+        const taskDescriptionValue = document.querySelector('.task-description-input').value;
+        const dueDateValue = document.querySelector('.due-date-input').value;
+        const priorityValue = document.querySelector('.priority-input').value;
+        const newTask = taskManager.createTaskItem(taskTitleValue, taskDescriptionValue, dueDateValue, priorityValue);
+        const tasksArray = taskManager.getInboxTaskArray();
+
+        taskManager.addTaskItemToArray(newTask);
+        displayController.checkRenderingCondition(tasksArray);
+        taskDialog.close();
+        taskForm.reset();
+
+    })
+
+    inboxNavButton.addEventListener('click', () => displayController.updateInboxTasksDisplay());
+
+    todayNavButton.addEventListener('click', () => displayController.updateTodayTasksDisplay());
+
+    thisWeekNavButton.addEventListener('click', () => displayController.updateThisWeekTasksDisplay());
+
+    
+})();
+
+

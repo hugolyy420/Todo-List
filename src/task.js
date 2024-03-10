@@ -4,10 +4,6 @@ import * as dateFns from "date-fns";
 export const taskManager = (() => {
 
     const inboxTasksArray = [];
-    const todayTasksArray = [];
-    const thisWeekTasksArray = [];
-    const completedTasksArray = [];
-
 
     const createTaskItem = function (title, description, dueDate, priority) {
 
@@ -22,7 +18,16 @@ export const taskManager = (() => {
 
     const getTodayTasksArray = (array) => array.filter((task) => task.formattedDueDate === dateFns.format(new Date(), 'dd MMMM yyyy'));
 
-    return { createTaskItem, getInboxTaskArray, addTaskItemToArray, getTodayTasksArray };
+    const getThisWeekTasksArray = function (array) {
+
+        const seventhDay = new Date ();
+        seventhDay.setDate(seventhDay.getDate() + 7);
+
+        return array.filter((task) => new Date (task.formattedDueDate).getDate() <= seventhDay.getDate());
+
+    }
+
+    return { createTaskItem, getInboxTaskArray, addTaskItemToArray, getTodayTasksArray, getThisWeekTasksArray };
 
 })();
 
