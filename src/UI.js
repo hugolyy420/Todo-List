@@ -7,12 +7,15 @@ import { taskManager } from './task';
 
 const domElementsCreator = (() => {
 
-    function createTaskElement (array) {
+    function createTaskElements (array, completeTab) {
 
-        const tasksContainer = document.querySelector('.tasks-container');
-        tasksContainer.textContent = "";
+        const elementsToBeDisplayed = [];
 
         for (let i = 0; i < array.length; i++) {
+
+            if ( !completeTab && array[i].complete) {
+                continue;
+            }
 
             const taskTitle = array[i].title;
             const taskDescription = array[i].description;
@@ -51,49 +54,73 @@ const domElementsCreator = (() => {
             }
 
             taskItem.append(taskCheckButton, taskTitleDiv, taskDueDateDiv, taskEditButton, taskDeleteButton);
+
+            elementsToBeDisplayed.push(taskItem);
             
-    
-            // const taskCheckButton = document.querySelector('.task-check-button');
-            // taskCheckButton.add
-            
-            tasksContainer.appendChild(taskItem);
+            // tasksContainer.appendChild(taskItem);
     
         }
 
+        return elementsToBeDisplayed;
 
     }
 
-    return {createTaskElement};
+    return {createTaskElements};
 
 })();
+
+// const domElementsEventsCreator = (() => {
+
+//     function createTaskCompleteEvent (taskContainer) {
+
+//         taskContainer.addEventListener
+
+//     }
+
+// })()
 
 const displayController = (() => {
 
     const taskDisplayHeading = document.querySelector('.task-display-heading');
+    const tasksContainer = document.querySelector('.tasks-container');
 
-    let inbox = true;
-    let today = false;
-    let thisWeek = false;
+    let inboxTab = true;
+    let todayTab = false;
+    let thisWeekTab = false;
+    let completeTab = false;
 
-    function renderTasksDisplay (array) {
+    function renderTasksDisplay (array, completeTab) {
 
-    domElementsCreator.createTaskElement(array);
+
+    tasksContainer.textContent = "";
+
+    const taskElementsToBeDisplayed = domElementsCreator.createTaskElements(array, completeTab);
+
+    for (let i = 0; i < taskElementsToBeDisplayed.length; i++) {
+
+        tasksContainer.appendChild(taskElementsToBeDisplayed[i]);
+
+    };
 
 }
 
     function checkRenderingCondition (array) {
 
-        if (inbox) {
+        if (inboxTab) {
 
             updateInboxTasksDisplay(array);
 
-        } else if (today) {
+        } else if (todayTab) {
 
             updateTodayTasksDisplay(array);
 
-        } else {
+        } else if (thisWeekTab){
 
             updateThisWeekTasksDisplay(array);
+
+        } else if (completeTab){
+
+            updateCompleteTasksDisplay(array);
 
         }
 
@@ -101,46 +128,64 @@ const displayController = (() => {
 
     function updateInboxTasksDisplay () {
 
-        inbox = true;
-        today = false;
-        thisWeek = false;
+        inboxTab = true;
+        todayTab = false;
+        thisWeekTab = false;
+        completeTab = false;
 
         const inboxTasksArray = taskManager.getInboxTaskArray();
 
         taskDisplayHeading.textContent = 'Inbox';
-        renderTasksDisplay(inboxTasksArray);
+        renderTasksDisplay(inboxTasksArray, completeTab);
 
     }   
 
     function updateTodayTasksDisplay () {
 
-        today = true;
-        inbox = false;
-        thisWeek = false;
+        todayTab = true;
+        inboxTab = false;
+        thisWeekTab = false;
+        completeTab = false;
 
         taskManager.createTodayTasksArray();
         const todayTasksArray = taskManager.getTodayTasksArray();
 
         taskDisplayHeading.textContent = 'Today';
-        renderTasksDisplay(todayTasksArray);
+        renderTasksDisplay(todayTasksArray, completeTab);
 
     }
 
     function updateThisWeekTasksDisplay () {
 
-        thisWeek = true;
-        today = false;
-        inbox = false;
+        thisWeekTab = true;
+        todayTab = false;
+        inboxTab = false;
+        completeTab = false;
 
         taskManager.createThisWeekTasksArray();
         const thisWeekTasksArray = taskManager.getThisWeekTasksArray();
 
         taskDisplayHeading.textContent = 'This Week';
-        renderTasksDisplay(thisWeekTasksArray);
+        renderTasksDisplay(thisWeekTasksArray, completeTab);
 
     }
 
-    return {renderTasksDisplay, updateInboxTasksDisplay, updateThisWeekTasksDisplay, updateTodayTasksDisplay, checkRenderingCondition};
+    function updateCompleteTasksDisplay () {
+
+        completeTab = true;
+        todayTab = false;
+        inboxTab = false;
+        thisWeekTab = false;
+
+        taskManager.createCompletetaskArray();
+        const completeTasksArray = taskManager.getCompleteTasksArray();
+
+        taskDisplayHeading.textContent = 'Completed';
+        renderTasksDisplay(completeTasksArray, completeTab);
+
+    }
+
+    return {renderTasksDisplay, updateInboxTasksDisplay, updateThisWeekTasksDisplay, updateTodayTasksDisplay, updateCompleteTasksDisplay, checkRenderingCondition};
 
 })();
 
@@ -152,6 +197,8 @@ const displayController = (() => {
     const todayNavButton = document.querySelector('.today');
     const inboxNavButton = document.querySelector('.inbox');
     const thisWeekNavButton = document.querySelector('.this-week');
+    const completeNavButton = document.querySelector('.complete');
+    const tasksContainer = document.querySelector('.tasks-container');
 
     addTaskButton.addEventListener('click', () => {
 
@@ -177,12 +224,26 @@ const displayController = (() => {
 
     })
 
+    tasksContainer.addEventListener('click', event => {
+
+        const target = event.target;
+
+        if (target.classList.contains('task-check-button')) {
+
+            taskManager.toggleTaskCompleteStatus(target.parentElement);
+            displayController.checkRenderingCondition(taskManager.getInboxTaskArray);
+
+        }
+
+    })
+
     inboxNavButton.addEventListener('click', () => displayController.updateInboxTasksDisplay());
 
     todayNavButton.addEventListener('click', () => displayController.updateTodayTasksDisplay());
 
     thisWeekNavButton.addEventListener('click', () => displayController.updateThisWeekTasksDisplay());
 
-    
+    completeNavButton.addEventListener('click', () => displayController.updateCompleteTasksDisplay());
+
 })();
 
