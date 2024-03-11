@@ -4,43 +4,81 @@ import { taskManager } from './task';
 //move dom task input content to make task item
 //loop through the array and display all task items
 
-const addTaskButton = document.querySelector('.add-task-button');
-const taskDialog = document.querySelector('.task-dialog');
-const taskForm = document.querySelector('.task-form');
-const todayNavButton = document.querySelector('.today');
-const inboxNavButton = document.querySelector('.inbox');
-const thisWeekNavButton = document.querySelector('.this-week');
-const taskDisplayHeading = document.querySelector('.task-display-heading');
-let inbox = true;
-let today = false;
-let thisWeek = false;
+
+const domElementsCreator = (() => {
+
+    function createTaskElement (array) {
+
+        const tasksContainer = document.querySelector('.tasks-container');
+        tasksContainer.textContent = "";
+
+        for (let i = 0; i < array.length; i++) {
+
+            const taskTitle = array[i].title;
+            const taskDescription = array[i].description;
+            const taskDueDate = array[i].formattedDueDate;
+            const taskPriority = array[i].priority;
+
+            const taskCheckButtonClassList = ['fa-regular', 'fa-circle', 'task-check-button'];
+            const taskEditButtonClassList = ['fa-regular', 'fa-pen-to-square'];
+            const taskDeleteButtonClassList = ['fa-regular', 'fa-trash-can'];
+    
+            const taskItem = document.createElement('div')
+            const taskCheckButton = document.createElement('i');
+            const taskTitleDiv = document.createElement('div');
+            const taskDueDateDiv = document.createElement('div');
+            const taskEditButton = document.createElement('i');
+            const taskDeleteButton = document.createElement('i');
+
+            taskCheckButton.classList.add(...taskCheckButtonClassList);
+            taskTitleDiv.classList.add('task-title');
+            taskDueDateDiv.classList.add('task-date');
+            taskEditButton.classList.add(...taskEditButtonClassList);
+            taskDeleteButton.classList.add(...taskDeleteButtonClassList);
+            taskItem.classList.add('task-item');
+
+            taskTitleDiv.textContent = taskTitle;
+            taskDueDateDiv.textContent = taskDueDate;
+    
+            if (array[i].hasOwnProperty('id')) {
+    
+                taskItem.dataset.number = array[i].id;
+    
+            } else {
+    
+                taskItem.dataset.number = i;
+    
+            }
+
+            taskItem.append(taskCheckButton, taskTitleDiv, taskDueDateDiv, taskEditButton, taskDeleteButton);
+            
+    
+            // const taskCheckButton = document.querySelector('.task-check-button');
+            // taskCheckButton.add
+            
+            tasksContainer.appendChild(taskItem);
+    
+        }
+
+
+    }
+
+    return {createTaskElement};
+
+})();
 
 const displayController = (() => {
 
+    const taskDisplayHeading = document.querySelector('.task-display-heading');
+
+    let inbox = true;
+    let today = false;
+    let thisWeek = false;
+
     function renderTasksDisplay (array) {
-    
-    const tasksContainer = document.querySelector('.tasks-container');
-    tasksContainer.textContent = "";
 
-    for (let i = 0; i < array.length; i++) {
+    domElementsCreator.createTaskElement(array);
 
-        const taskTitle = array[i].title;
-        const taskDescription = array[i].description;
-        const taskDueDate = array[i].formattedDueDate;
-        const taskPriority = array[i].priority;
-
-        const taskItem = document.createElement('div')
-        taskItem.classList.add('task-item');
-
-        taskItem.innerHTML = `<i class="fa-regular fa-circle task-check-button"></i>
-        <div class="task-title">${taskTitle}</div>
-        <div class="task-date">${taskDueDate}</div>
-        <i class="fa-regular fa-pen-to-square"></i>
-        <i class="fa-regular fa-trash-can"></i>`
-        
-        tasksContainer.appendChild(taskItem);
-
-    }
 }
 
     function checkRenderingCondition (array) {
@@ -67,11 +105,10 @@ const displayController = (() => {
         today = false;
         thisWeek = false;
 
-        const tasksArray = taskManager.getInboxTaskArray();
+        const inboxTasksArray = taskManager.getInboxTaskArray();
 
         taskDisplayHeading.textContent = 'Inbox';
-        renderTasksDisplay(tasksArray);
-
+        renderTasksDisplay(inboxTasksArray);
 
     }   
 
@@ -81,8 +118,8 @@ const displayController = (() => {
         inbox = false;
         thisWeek = false;
 
-        const tasksArray = taskManager.getInboxTaskArray();
-        const todayTasksArray = taskManager.getTodayTasksArray(tasksArray)
+        taskManager.createTodayTasksArray();
+        const todayTasksArray = taskManager.getTodayTasksArray();
 
         taskDisplayHeading.textContent = 'Today';
         renderTasksDisplay(todayTasksArray);
@@ -95,8 +132,8 @@ const displayController = (() => {
         today = false;
         inbox = false;
 
-        const tasksArray = taskManager.getInboxTaskArray();
-        const thisWeekTasksArray = taskManager.getThisWeekTasksArray(tasksArray);
+        taskManager.createThisWeekTasksArray();
+        const thisWeekTasksArray = taskManager.getThisWeekTasksArray();
 
         taskDisplayHeading.textContent = 'This Week';
         renderTasksDisplay(thisWeekTasksArray);
@@ -108,6 +145,13 @@ const displayController = (() => {
 })();
 
 (function createEvents () {
+
+    const addTaskButton = document.querySelector('.add-task-button');
+    const taskDialog = document.querySelector('.task-dialog');
+    const taskForm = document.querySelector('.task-form');
+    const todayNavButton = document.querySelector('.today');
+    const inboxNavButton = document.querySelector('.inbox');
+    const thisWeekNavButton = document.querySelector('.this-week');
 
     addTaskButton.addEventListener('click', () => {
 
@@ -141,5 +185,4 @@ const displayController = (() => {
 
     
 })();
-
 

@@ -82,3 +82,7 @@ header {
 .task-title {
 	flex: 1;
 }
+
+.task-check-button:hover {
+	cursor: pointer;
+}
