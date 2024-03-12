@@ -24,12 +24,6 @@
         <button class="add-project-button">+</button>
     </div>
     <div class="project-container">
-      <div class="project-tab">
-          <i class="fa-solid fa-list-check project-tab-icon"></i>
-          <div class="project-tab-name">Lorem, ipsum dolor</div>
-          <i class="fa-regular fa-pen-to-square project-edit-button"></i> 
-          <i class="fa-regular fa-trash-can project-delete-button"></i> 
-      </div>
     </div>
     <button class="add-task-button">+</button>
   </nav>
@@ -52,6 +46,12 @@
           <option value="low">Low</option>
           <option value="medium">Medium</option>
           <option value="high">High</option>
+        </select>
+      </div>
+      <div class="question-group">
+        <label for="project">Project</label>
+        <select name="project" id="priority" class="project-name-input">
+          <option value="inbox">Inbox</option>
         </select>
       </div>
       <input type="submit" class="task-submit-button">

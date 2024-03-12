@@ -2,6 +2,11 @@ import './styles.css';
 import { taskManager } from './task';
 import { projectManager } from './project';
 
+//**AFTER complete project manager function logics */
+//function for creating options element and pushing project tab name into each element(for loop)
+//submit taskdialog, use projectManager to assign the task to the corresponding project tasks array
+//
+
 const domElementsCreator = (() => {
 
     function createTaskElements(array, completeTab) {
@@ -101,7 +106,28 @@ const domElementsCreator = (() => {
 
     }
 
-    return { createTaskElements, createProjectElements };
+    function createProjectOptionElements (array) {
+
+        const projectOptionElementsArray = [];
+
+        for (let i = 0; i < array.length; i++) {
+
+            const projectName = array[i];
+            const formattedprojectName = projectName.toLowerCase();
+            const projectOption = document.createElement('option');
+
+            projectOption.setAttribute('value', formattedprojectName);
+            projectOption.textContent = projectName;
+
+            projectOptionElementsArray.push(projectOption);
+
+        }
+
+        return projectOptionElementsArray;
+
+    }
+
+    return { createTaskElements, createProjectElements, createProjectOptionElements };
 
 })();
 
@@ -136,8 +162,6 @@ const displayController = (() => {
         projectsContainer.textContent = "";
 
         const projectElementsToBeDisplayed = domElementsCreator.createProjectElements(array);
-
-        console.log('projectArray:' + projectElementsToBeDisplayed);
 
         for (let i = 0; i < projectElementsToBeDisplayed.length; i++) {
 
@@ -229,9 +253,32 @@ const displayController = (() => {
 
     }
 
-    // function updateProject
+    function updateProjectTaskDisplays () {
 
-    return { renderTasksDisplay, updateInboxTasksDisplay, updateThisWeekTasksDisplay, updateTodayTasksDisplay, updateCompleteTasksDisplay, checkRenderingCondition, renderProjectsDisplay };
+        //set tasksDisplayHeading to project name
+        //
+
+    }
+
+    function updateProjectSelections () {
+
+        const projectOptionsContainer = document.querySelector('.project-name-input');
+
+        projectOptionsContainer.innerHTML = `<option value="inbox">Inbox</option>`
+
+        const updatedProjectNamesArray = projectManager.getEachProjectName();
+
+        const projectOptionElementsToBeAdded = domElementsCreator.createProjectOptionElements(updatedProjectNamesArray);
+
+        for (let i = 0; i < projectOptionElementsToBeAdded.length; i++) {
+
+            projectOptionsContainer.appendChild(projectOptionElementsToBeAdded[i]);
+
+        };
+
+    }
+
+    return { renderTasksDisplay, updateInboxTasksDisplay, updateThisWeekTasksDisplay, updateTodayTasksDisplay, updateCompleteTasksDisplay, checkRenderingCondition, renderProjectsDisplay, updateProjectSelections };
 
 })();
 
@@ -249,6 +296,7 @@ const displayController = (() => {
     const thisWeekNavButton = document.querySelector('.this-week');
     const completeNavButton = document.querySelector('.complete');
     const tasksContainer = document.querySelector('.tasks-container');
+    const navBar = document.querySelector('.nav-bar');
 
 
     addTaskButton.addEventListener('click', () => {
@@ -269,9 +317,12 @@ const displayController = (() => {
 
         const newProject = createNewProjectObject();
         projectManager.addProjectObjectToArray(newProject);
+
         const newProjectsArray = projectManager.getProjectArray();
-        console.log(newProjectsArray);
         displayController.renderProjectsDisplay(newProjectsArray);
+
+        displayController.updateProjectSelections();
+
         addProjectDialog.close();
         projectForm.reset();
 
@@ -303,6 +354,18 @@ const displayController = (() => {
 
     })
 
+    navBar.addEventListener('click', event => {
+
+        const target = event.target;
+
+        if (target.classList.contains('project-tab')) {
+
+            displayController.updateProjectTaskDisplays();
+
+        }
+
+    })
+
     inboxNavButton.addEventListener('click', () => displayController.updateInboxTasksDisplay());
 
     todayNavButton.addEventListener('click', () => displayController.updateTodayTasksDisplay());
@@ -310,6 +373,8 @@ const displayController = (() => {
     thisWeekNavButton.addEventListener('click', () => displayController.updateThisWeekTasksDisplay());
 
     completeNavButton.addEventListener('click', () => displayController.updateCompleteTasksDisplay());
+
+
 
     function createNewTaskObject() {
 

@@ -1,7 +1,11 @@
 import { taskManager } from "./task";
 
-//function for creating pj array
-//function for getting the array
+//function for getting each project name
+//for loop and push each pj name into an array
+//function for getting the name array
+// => so user can select project where the task goes to
+//function to assign task object to corresponding project tasks array after receiving user input
+//function 
 
 export const projectManager = (() => {
 
@@ -23,7 +27,9 @@ export const projectManager = (() => {
 
     const getProjectArray = () => projectsArray;
 
-    return {createProjectObject, getProjectArray, addProjectObjectToArray};
+    const getEachProjectName = () => projectsArray.map(project => project.name);
+
+    return {createProjectObject, getProjectArray, addProjectObjectToArray, getEachProjectName};
 
 })();
 
