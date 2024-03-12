@@ -15,14 +15,20 @@
   </header>
 
   <nav class="nav-bar">
-    <button class="nav-button inbox">Inbox</button>
-    <button class="nav-button today">Today</button>
-    <button class="nav-button this-week">This week</button>
-    <button class="nav-button complete">Completed</button>
-    <div class="project-holder">
-      <div class="project-heading">
+    <div class="nav-button inbox">Inbox</div>
+    <div class="nav-button today">Today</div>
+    <div class="nav-button this-week">This week</div>
+    <div class="nav-button complete">Completed</div>
+    <div class="project-heading">
         <h2>Projects</h2>
         <button class="add-project-button">+</button>
+    </div>
+    <div class="project-container">
+      <div class="project-tab">
+          <i class="fa-solid fa-list-check project-tab-icon"></i>
+          <div class="project-tab-name">Lorem, ipsum dolor</div>
+          <i class="fa-regular fa-pen-to-square project-edit-button"></i> 
+          <i class="fa-regular fa-trash-can project-delete-button"></i> 
       </div>
     </div>
     <button class="add-task-button">+</button>
@@ -49,6 +55,13 @@
         </select>
       </div>
       <input type="submit" class="task-submit-button">
+    </form>
+  </dialog>
+
+  <dialog class="project-dialog">
+    <form action="" class="project-form">
+      <input type="text" name="project" placeholder="Project Name" class="project-name">
+      <input type="submit" class="project-submit-button">
     </form>
   </dialog>
   
