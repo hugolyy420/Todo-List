@@ -1,19 +1,19 @@
 import './styles.css';
 import { taskManager } from './task';
-
-//move dom task input content to make task item
-//loop through the array and display all task items
-
+import { projectManager } from './project';
 
 const domElementsCreator = (() => {
 
-    function createTaskElements (array, completeTab) {
+    function createTaskElements(array, completeTab) {
 
         const elementsToBeDisplayed = [];
+        const taskCheckButtonClassList = ['fa-regular', 'fa-circle', 'task-check-button'];
+        const taskEditButtonClassList = ['fa-regular', 'fa-pen-to-square', 'task-edit-button'];
+        const taskDeleteButtonClassList = ['fa-regular', 'fa-trash-can', 'task-delete-button'];
 
         for (let i = 0; i < array.length; i++) {
 
-            if ( !completeTab && array[i].complete) {
+            if (!completeTab && array[i].complete) {
                 continue;
             }
 
@@ -22,10 +22,6 @@ const domElementsCreator = (() => {
             const taskDueDate = array[i].formattedDueDate;
             const taskPriority = array[i].priority;
 
-            const taskCheckButtonClassList = ['fa-regular', 'fa-circle', 'task-check-button'];
-            const taskEditButtonClassList = ['fa-regular', 'fa-pen-to-square'];
-            const taskDeleteButtonClassList = ['fa-regular', 'fa-trash-can'];
-    
             const taskItem = document.createElement('div')
             const taskCheckButton = document.createElement('i');
             const taskTitleDiv = document.createElement('div');
@@ -42,112 +38,160 @@ const domElementsCreator = (() => {
 
             taskTitleDiv.textContent = taskTitle;
             taskDueDateDiv.textContent = taskDueDate;
-    
+
             if (array[i].hasOwnProperty('id')) {
-    
+
                 taskItem.dataset.number = array[i].id;
-    
+
             } else {
-    
+
                 taskItem.dataset.number = i;
-    
+
             }
 
             taskItem.append(taskCheckButton, taskTitleDiv, taskDueDateDiv, taskEditButton, taskDeleteButton);
 
             elementsToBeDisplayed.push(taskItem);
-            
-            // tasksContainer.appendChild(taskItem);
-    
+
         }
 
         return elementsToBeDisplayed;
 
     }
 
-    return {createTaskElements};
+    function createProjectElements(array) {
+
+        //create an array to contain all project elements to be displayed
+        //create elements one by one
+        //for loop to extract project name and push it into textContent
+        //push the finished element into array
+        //return the array
+
+        const projectElementsToBeDisplayed = [];
+        const projectTabIconClassList = ['fa-solid', 'fa-list-check', 'project-tab-icon'];
+        const projectTabEditButtonClassList = ['fa-regular', 'fa-pen-to-square', 'project-edit-button'];
+        const projectTabDeleteButtonClassList = ['fa-regular', 'fa-trash-can', 'project-delete-button'];
+
+        for (let i = 0; i < array.length; i++) {
+
+            const projectName = array[i].name;
+
+            const projectTab = document.createElement('div');
+            const projectTabIcon = document.createElement('i');
+            const projectTabName = document.createElement('div');
+            const projectTabEditButton = document.createElement('i');
+            const projectTabDeleteButton = document.createElement('i');
+
+            projectTab.classList.add('project-tab');
+            projectTabIcon.classList.add(...projectTabIconClassList);
+            projectTabName.classList.add('project-tab-name');
+            projectTabEditButton.classList.add(...projectTabEditButtonClassList);
+            projectTabDeleteButton.classList.add(...projectTabDeleteButtonClassList);
+
+            projectTabName.textContent = projectName;
+            projectTab.dataset.number = i;
+
+            projectTab.append(projectTabIcon, projectTabName, projectTabEditButton, projectTabDeleteButton);
+
+            projectElementsToBeDisplayed.push(projectTab);
+
+        }
+
+        return projectElementsToBeDisplayed;
+
+    }
+
+    return { createTaskElements, createProjectElements };
 
 })();
-
-// const domElementsEventsCreator = (() => {
-
-//     function createTaskCompleteEvent (taskContainer) {
-
-//         taskContainer.addEventListener
-
-//     }
-
-// })()
 
 const displayController = (() => {
 
     const taskDisplayHeading = document.querySelector('.task-display-heading');
     const tasksContainer = document.querySelector('.tasks-container');
+    const projectsContainer = document.querySelector('.project-container');
 
     let inboxTab = true;
     let todayTab = false;
     let thisWeekTab = false;
     let completeTab = false;
 
-    function renderTasksDisplay (array, completeTab) {
+    function renderTasksDisplay(array, completeTab) {
 
 
-    tasksContainer.textContent = "";
+        tasksContainer.textContent = "";
 
-    const taskElementsToBeDisplayed = domElementsCreator.createTaskElements(array, completeTab);
+        const taskElementsToBeDisplayed = domElementsCreator.createTaskElements(array, completeTab);
 
-    for (let i = 0; i < taskElementsToBeDisplayed.length; i++) {
+        for (let i = 0; i < taskElementsToBeDisplayed.length; i++) {
 
-        tasksContainer.appendChild(taskElementsToBeDisplayed[i]);
+            tasksContainer.appendChild(taskElementsToBeDisplayed[i]);
+
+        };
+
+    }
+
+    function renderProjectsDisplay(array) {
+
+        projectsContainer.textContent = "";
+
+        const projectElementsToBeDisplayed = domElementsCreator.createProjectElements(array);
+
+        console.log('projectArray:' + projectElementsToBeDisplayed);
+
+        for (let i = 0; i < projectElementsToBeDisplayed.length; i++) {
+
+            projectsContainer.appendChild(projectElementsToBeDisplayed[i]);
+
+        };
 
     };
 
-}
-
-    function checkRenderingCondition (array) {
+    function checkRenderingCondition() {
 
         if (inboxTab) {
 
-            updateInboxTasksDisplay(array);
+            updateInboxTasksDisplay();
 
         } else if (todayTab) {
 
-            updateTodayTasksDisplay(array);
+            updateTodayTasksDisplay();
 
-        } else if (thisWeekTab){
+        } else if (thisWeekTab) {
 
-            updateThisWeekTasksDisplay(array);
+            updateThisWeekTasksDisplay();
 
-        } else if (completeTab){
+        } else if (completeTab) {
 
-            updateCompleteTasksDisplay(array);
+            updateCompleteTasksDisplay();
 
         }
 
     }
 
-    function updateInboxTasksDisplay () {
+    function updateInboxTasksDisplay() {
 
         inboxTab = true;
         todayTab = false;
         thisWeekTab = false;
         completeTab = false;
 
+        taskManager.updateAllArrays();
         const inboxTasksArray = taskManager.getInboxTaskArray();
 
         taskDisplayHeading.textContent = 'Inbox';
         renderTasksDisplay(inboxTasksArray, completeTab);
 
-    }   
+    }
 
-    function updateTodayTasksDisplay () {
+    function updateTodayTasksDisplay() {
 
         todayTab = true;
         inboxTab = false;
         thisWeekTab = false;
         completeTab = false;
 
-        taskManager.createTodayTasksArray();
+        taskManager.updateAllArrays();
         const todayTasksArray = taskManager.getTodayTasksArray();
 
         taskDisplayHeading.textContent = 'Today';
@@ -155,14 +199,14 @@ const displayController = (() => {
 
     }
 
-    function updateThisWeekTasksDisplay () {
+    function updateThisWeekTasksDisplay() {
 
         thisWeekTab = true;
         todayTab = false;
         inboxTab = false;
         completeTab = false;
 
-        taskManager.createThisWeekTasksArray();
+        taskManager.updateAllArrays();
         const thisWeekTasksArray = taskManager.getThisWeekTasksArray();
 
         taskDisplayHeading.textContent = 'This Week';
@@ -170,14 +214,14 @@ const displayController = (() => {
 
     }
 
-    function updateCompleteTasksDisplay () {
+    function updateCompleteTasksDisplay() {
 
         completeTab = true;
         todayTab = false;
         inboxTab = false;
         thisWeekTab = false;
 
-        taskManager.createCompletetaskArray();
+        taskManager.updateAllArrays();
         const completeTasksArray = taskManager.getCompleteTasksArray();
 
         taskDisplayHeading.textContent = 'Completed';
@@ -185,41 +229,63 @@ const displayController = (() => {
 
     }
 
-    return {renderTasksDisplay, updateInboxTasksDisplay, updateThisWeekTasksDisplay, updateTodayTasksDisplay, updateCompleteTasksDisplay, checkRenderingCondition};
+    // function updateProject
+
+    return { renderTasksDisplay, updateInboxTasksDisplay, updateThisWeekTasksDisplay, updateTodayTasksDisplay, updateCompleteTasksDisplay, checkRenderingCondition, renderProjectsDisplay };
 
 })();
 
-(function createEvents () {
+(function createEvents() {
 
-    const addTaskButton = document.querySelector('.add-task-button');
-    const taskDialog = document.querySelector('.task-dialog');
+
+    const addTaskDialog = document.querySelector('.task-dialog');
+    const addProjectDialog = document.querySelector('.project-dialog');
     const taskForm = document.querySelector('.task-form');
+    const projectForm = document.querySelector('.project-form');
+    const addTaskButton = document.querySelector('.add-task-button');
+    const addProjectButton = document.querySelector('.add-project-button');
     const todayNavButton = document.querySelector('.today');
     const inboxNavButton = document.querySelector('.inbox');
     const thisWeekNavButton = document.querySelector('.this-week');
     const completeNavButton = document.querySelector('.complete');
     const tasksContainer = document.querySelector('.tasks-container');
 
+
     addTaskButton.addEventListener('click', () => {
 
-        taskDialog.showModal();
+        addTaskDialog.showModal();
 
-});
-    
-    taskForm.addEventListener('submit',  event => {
+    });
+
+    addProjectButton.addEventListener('click', () => {
+
+        addProjectDialog.showModal();
+
+    })
+
+    projectForm.addEventListener('submit', event => {
 
         event.preventDefault();
 
-        const taskTitleValue = document.querySelector('.task-title-input').value;
-        const taskDescriptionValue = document.querySelector('.task-description-input').value;
-        const dueDateValue = document.querySelector('.due-date-input').value;
-        const priorityValue = document.querySelector('.priority-input').value;
-        const newTask = taskManager.createTaskItem(taskTitleValue, taskDescriptionValue, dueDateValue, priorityValue);
-        const tasksArray = taskManager.getInboxTaskArray();
+        const newProject = createNewProjectObject();
+        projectManager.addProjectObjectToArray(newProject);
+        const newProjectsArray = projectManager.getProjectArray();
+        console.log(newProjectsArray);
+        displayController.renderProjectsDisplay(newProjectsArray);
+        addProjectDialog.close();
+        projectForm.reset();
 
+
+    })
+
+    taskForm.addEventListener('submit', event => {
+
+        event.preventDefault();
+
+        const newTask = createNewTaskObject();
         taskManager.addTaskItemToArray(newTask);
-        displayController.checkRenderingCondition(tasksArray);
-        taskDialog.close();
+        displayController.checkRenderingCondition();
+        addTaskDialog.close();
         taskForm.reset();
 
     })
@@ -231,7 +297,7 @@ const displayController = (() => {
         if (target.classList.contains('task-check-button')) {
 
             taskManager.toggleTaskCompleteStatus(target.parentElement);
-            displayController.checkRenderingCondition(taskManager.getInboxTaskArray);
+            displayController.checkRenderingCondition();
 
         }
 
@@ -244,6 +310,24 @@ const displayController = (() => {
     thisWeekNavButton.addEventListener('click', () => displayController.updateThisWeekTasksDisplay());
 
     completeNavButton.addEventListener('click', () => displayController.updateCompleteTasksDisplay());
+
+    function createNewTaskObject() {
+
+        const taskTitleValue = document.querySelector('.task-title-input').value;
+        const taskDescriptionValue = document.querySelector('.task-description-input').value;
+        const dueDateValue = document.querySelector('.due-date-input').value;
+        const priorityValue = document.querySelector('.priority-input').value;
+
+        return taskManager.createTaskItem(taskTitleValue, taskDescriptionValue, dueDateValue, priorityValue);
+
+    }
+
+    function createNewProjectObject() {
+
+        const newProjectNameValue = document.querySelector('.project-name').value;
+        return projectManager.createProjectObject(newProjectNameValue);
+
+    }
 
 })();
 

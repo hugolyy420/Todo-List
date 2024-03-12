@@ -22,7 +22,7 @@ time, mark, audio, video {
 body {
     font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 	display: grid;
-	grid-template-columns: auto 1fr;
+	grid-template-columns: minmax(300px, 0.4fr) 1fr;
 	grid-template-rows: auto 1fr;
 	min-height: 100vh;
 	position: relative;
@@ -38,18 +38,14 @@ header {
 
 .nav-bar {
 	background-color: #aaaaaa;
-	display: flex;
-	flex-direction: column;
 	padding: 1em;
 }
 
-.nav-button {
-	background-color: transparent;
-	border: 1px solid transparent;
-	padding: 0.2em 3em;
+.nav-button, .project-tab {
+	padding: 0.2em 1em;
 }
 
-.nav-button:hover {
+.nav-button:hover, .project-tab:hover {
 	background-color: #e1e1e1;
 }
 
@@ -85,4 +81,14 @@ header {
 
 .task-check-button:hover {
 	cursor: pointer;
+}
+
+.project-tab {
+	display: flex;
+	align-items: center;
+	gap: 0.5em;
+}
+
+.project-tab-name {
+	flex: 1;
 }

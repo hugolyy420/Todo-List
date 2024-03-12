@@ -1,13 +1,4 @@
 import * as dateFns from "date-fns";
-//create a factory function to make task item
-
-//loop through inboxTasksArray and look for objects that match the condition
-// assign it a property that references the index
-// render the table by giving the dom element an id corresponding the index
-
-//if mark complete skip render
-//push the object into completetaskArray
-//display object with complete status in complete tab
 
 export const taskManager = (() => {
 
@@ -18,64 +9,50 @@ export const taskManager = (() => {
 
     const createTaskItem = function (title, description, dueDate, priority) {
 
-        const formattedDueDate = dateFns.format(dueDate, 'dd MMMM yyyy');
+        const formattedDueDate = formateDate(dueDate);
 
         return { title, description, formattedDueDate, priority, complete: false };
     }
 
-    const createTodayTasksArray = function () {
+    const updateAllArrays = function () {
         
         todayTasksArray = [];
-
-        for (let i = 0; i < inboxTasksArray.length; i++) {
-
-            if (inboxTasksArray[i].formattedDueDate === dateFns.format(new Date(), 'dd MMMM yyyy')) {
-
-                inboxTasksArray[i].id = i;
-                todayTasksArray.push(inboxTasksArray[i]);
-
-            }
-
-        }
-
-    };
-
-    const createThisWeekTasksArray = function () {
-
         thisWeekTasksArray = [];
-
+        completeTasksArray = [];
+        
         const seventhDay = new Date ();
         seventhDay.setDate(seventhDay.getDate() + 7);
 
+
         for (let i = 0; i < inboxTasksArray.length; i++) {
 
+            inboxTasksArray[i].id = i;
+            console.log(inboxTasksArray[i]);
+
+            if (inboxTasksArray[i].formattedDueDate === dateFns.format(new Date(), 'dd MMMM yyyy')) {
+
+                
+                todayTasksArray.push(inboxTasksArray[i]);
+
+            }  
+            
             if (new Date(inboxTasksArray[i].formattedDueDate).getDate() <= seventhDay.getDate() && new Date(inboxTasksArray[i].formattedDueDate).getDate() >= new Date().getDate()) {
 
-                inboxTasksArray[i].id = i;
+                
                 thisWeekTasksArray.push(inboxTasksArray[i]);
 
-            }
-
-        }
-
-    }
-
-    const createCompletetaskArray = function () {
-
-        completeTasksArray = [];
-
-        for (let i = 0; i < inboxTasksArray.length; i++) {
-
+            }  
+            
             if (inboxTasksArray[i].complete) {
 
-                inboxTasksArray[i].id = i;
+                
                 completeTasksArray.push(inboxTasksArray[i]);
 
             }
 
         }
 
-    }
+    };
 
     const getInboxTaskArray = () => inboxTasksArray;
 
@@ -94,11 +71,11 @@ export const taskManager = (() => {
 
         inboxTasksArray[taskObjectIndex].complete = isComplete ? false : true ;
 
-        console.log(inboxTasksArray[taskObjectIndex]);
-
     } 
 
-    return { createTaskItem, createTodayTasksArray, createThisWeekTasksArray, getInboxTaskArray, addTaskItemToArray, getTodayTasksArray, getThisWeekTasksArray, toggleTaskCompleteStatus, createCompletetaskArray, getCompleteTasksArray };
+    const formateDate = (dueDate) => dueDate === "" ? "" : dateFns.format(dueDate, 'dd MMMM yyyy');
+
+    return { createTaskItem, updateAllArrays, getInboxTaskArray, addTaskItemToArray, getTodayTasksArray, getThisWeekTasksArray, toggleTaskCompleteStatus, getCompleteTasksArray };
 
 })();
 
