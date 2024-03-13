@@ -20,8 +20,8 @@
     <div class="nav-button this-week">This week</div>
     <div class="nav-button complete">Completed</div>
     <div class="project-heading">
-        <h2>Projects</h2>
-        <button class="add-project-button">+</button>
+      <h2>Projects</h2>
+      <button class="add-project-button">+</button>
     </div>
     <div class="project-container">
     </div>
@@ -35,7 +35,8 @@
         <input type="text" name="title" placeholder="Title: Grocery" class="task-title-input">
       </div>
       <div class="question-group">
-        <input type="text" name="description" placeholder="Details: e.g. apple, milk, cucumber" class="task-description-input">
+        <input type="text" name="description" placeholder="Details: e.g. apple, milk, cucumber"
+          class="task-description-input">
       </div>
       <div class="question-group">
         <label for="date">Due Date:</label><input type="date" id="date" name="date" class="due-date-input">
@@ -51,7 +52,7 @@
       <div class="question-group">
         <label for="project">Project</label>
         <select name="project" id="priority" class="project-name-input">
-          <option value="inbox">Inbox</option>
+          <option value="Inbox">Inbox</option>
         </select>
       </div>
       <input type="submit" class="task-submit-button">
@@ -64,10 +65,20 @@
       <input type="submit" class="project-submit-button">
     </form>
   </dialog>
-  
+
   <div class="tasks-display">
     <h2 class="task-display-heading">Inbox</h2>
     <div class="tasks-container">
+      <div class="task-item" data-number="0"><i class="fa-regular fa-circle task-check-button" aria-hidden="true"></i>
+        <div class="task-title">ABC</div>
+        <div class="task-date"></div><i class="fa-regular fa-pen-to-square task-edit-button" aria-hidden="true"></i><i
+          class="fa-regular fa-trash-can task-delete-button" aria-hidden="true"></i>
+      </div>
+      <div class="task-item" data-number="0"><i class="fa-regular fa-circle task-check-button" aria-hidden="true"></i>
+        <div class="task-title">CDE</div>
+        <div class="task-date"></div><i class="fa-regular fa-pen-to-square task-edit-button" aria-hidden="true"></i><i
+          class="fa-regular fa-trash-can task-delete-button" aria-hidden="true"></i>
+      </div>
     </div>
   </div>
 

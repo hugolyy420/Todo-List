@@ -44,9 +44,9 @@ const domElementsCreator = (() => {
             taskTitleDiv.textContent = taskTitle;
             taskDueDateDiv.textContent = taskDueDate;
 
-            if (array[i].hasOwnProperty('id')) {
+            if (array[i].hasOwnProperty('taskIndex')) {
 
-                taskItem.dataset.number = array[i].id;
+                taskItem.dataset.number = array[i].taskIndex;
 
             } else {
 
@@ -94,7 +94,7 @@ const domElementsCreator = (() => {
             projectTabDeleteButton.classList.add(...projectTabDeleteButtonClassList);
 
             projectTabName.textContent = projectName;
-            projectTab.dataset.number = i;
+            projectTab.dataset.number = i + 1;
 
             projectTab.append(projectTabIcon, projectTabName, projectTabEditButton, projectTabDeleteButton);
 
@@ -113,10 +113,9 @@ const domElementsCreator = (() => {
         for (let i = 0; i < array.length; i++) {
 
             const projectName = array[i];
-            const formattedprojectName = projectName.toLowerCase();
             const projectOption = document.createElement('option');
 
-            projectOption.setAttribute('value', formattedprojectName);
+            projectOption.setAttribute('value', projectName);
             projectOption.textContent = projectName;
 
             projectOptionElementsArray.push(projectOption);
@@ -141,6 +140,7 @@ const displayController = (() => {
     let todayTab = false;
     let thisWeekTab = false;
     let completeTab = false;
+    let projectTab = false;
 
     function renderTasksDisplay(array, completeTab) {
 
@@ -171,7 +171,7 @@ const displayController = (() => {
 
     };
 
-    function checkRenderingCondition() {
+    function checkRenderingCondition(projectTasksArray, projectNameIndex) {
 
         if (inboxTab) {
 
@@ -189,6 +189,10 @@ const displayController = (() => {
 
             updateCompleteTasksDisplay();
 
+        } else if (projectTab) {
+
+            updateProjectTaskDisplays(projectTasksArray, projectNameIndex);
+
         }
 
     }
@@ -199,10 +203,11 @@ const displayController = (() => {
         todayTab = false;
         thisWeekTab = false;
         completeTab = false;
+        projectTab = false;
 
         taskManager.updateAllArrays();
         const inboxTasksArray = taskManager.getInboxTaskArray();
-
+        
         taskDisplayHeading.textContent = 'Inbox';
         renderTasksDisplay(inboxTasksArray, completeTab);
 
@@ -214,6 +219,7 @@ const displayController = (() => {
         inboxTab = false;
         thisWeekTab = false;
         completeTab = false;
+        projectTab = false;
 
         taskManager.updateAllArrays();
         const todayTasksArray = taskManager.getTodayTasksArray();
@@ -229,6 +235,7 @@ const displayController = (() => {
         todayTab = false;
         inboxTab = false;
         completeTab = false;
+        projectTab = false;
 
         taskManager.updateAllArrays();
         const thisWeekTasksArray = taskManager.getThisWeekTasksArray();
@@ -244,6 +251,7 @@ const displayController = (() => {
         todayTab = false;
         inboxTab = false;
         thisWeekTab = false;
+        projectTab = false;
 
         taskManager.updateAllArrays();
         const completeTasksArray = taskManager.getCompleteTasksArray();
@@ -253,10 +261,20 @@ const displayController = (() => {
 
     }
 
-    function updateProjectTaskDisplays () {
+    function updateProjectTaskDisplays (projectTasksArray, projectNameIndex) {
 
-        //set tasksDisplayHeading to project name
-        //
+        projectTab = true;
+        todayTab = false;
+        inboxTab = false;
+        thisWeekTab = false;
+        completeTab = false;
+
+        taskManager.updateAllArrays();
+        const projectNameList = projectManager.getEachProjectName();
+        const projectName = projectNameList[projectNameIndex];
+
+        taskDisplayHeading.textContent = projectName;
+        renderTasksDisplay(projectTasksArray, completeTab);
 
     }
 
@@ -264,7 +282,7 @@ const displayController = (() => {
 
         const projectOptionsContainer = document.querySelector('.project-name-input');
 
-        projectOptionsContainer.innerHTML = `<option value="inbox">Inbox</option>`
+        projectOptionsContainer.innerHTML = `<option value="Inbox">Inbox</option>`
 
         const updatedProjectNamesArray = projectManager.getEachProjectName();
 
@@ -278,7 +296,9 @@ const displayController = (() => {
 
     }
 
-    return { renderTasksDisplay, updateInboxTasksDisplay, updateThisWeekTasksDisplay, updateTodayTasksDisplay, updateCompleteTasksDisplay, checkRenderingCondition, renderProjectsDisplay, updateProjectSelections };
+    const isProjectTab = () => projectTab;
+
+    return { renderTasksDisplay, updateInboxTasksDisplay, updateThisWeekTasksDisplay, updateTodayTasksDisplay, updateCompleteTasksDisplay, checkRenderingCondition, renderProjectsDisplay, updateProjectSelections, updateProjectTaskDisplays, isProjectTab };
 
 })();
 
@@ -297,6 +317,7 @@ const displayController = (() => {
     const completeNavButton = document.querySelector('.complete');
     const tasksContainer = document.querySelector('.tasks-container');
     const navBar = document.querySelector('.nav-bar');
+    const projectNameInput = document.querySelector('.project-name-input');
 
 
     addTaskButton.addEventListener('click', () => {
@@ -333,8 +354,36 @@ const displayController = (() => {
 
         event.preventDefault();
 
-        const newTask = createNewTaskObject();
+        const projectName = getProjectName();
+        let projectIndex = getProjectIndex();
+        let projectTasksArray;
+
+        const newTask = createNewTaskObject(projectName, projectIndex);
         taskManager.addTaskItemToArray(newTask);
+
+        
+
+        if (projectIndex !== 0) {
+
+            projectTasksArray = taskManager.getProjectTasksArray(projectIndex);
+            projectIndex--;
+            displayController.checkRenderingCondition(projectTasksArray, projectIndex);
+            addTaskDialog.close();
+            taskForm.reset();
+            return;
+
+       };
+
+       // if inbox project name input and in project tab
+        // get current tab index (active class)
+
+       if (projectIndex == 0 && displayController.isProjectTab()) {
+
+            addTaskDialog.close();
+            taskForm.reset();
+            return;
+       }
+
         displayController.checkRenderingCondition();
         addTaskDialog.close();
         taskForm.reset();
@@ -348,6 +397,18 @@ const displayController = (() => {
         if (target.classList.contains('task-check-button')) {
 
             taskManager.toggleTaskCompleteStatus(target.parentElement);
+
+            if (displayController.isProjectTab()) {
+                
+                const activeProjectTab = document.querySelector('.active');
+                let projectIndex = activeProjectTab.dataset.number;
+                let projectTasksArray = taskManager.getProjectTasksArray(projectIndex);
+                projectIndex--;
+                displayController.checkRenderingCondition(projectTasksArray, projectIndex);
+                return;
+
+            }
+
             displayController.checkRenderingCondition();
 
         }
@@ -356,11 +417,20 @@ const displayController = (() => {
 
     navBar.addEventListener('click', event => {
 
-        const target = event.target;
+        const target = event.target.closest('.project-tab');
 
-        if (target.classList.contains('project-tab')) {
+        if (target) {
 
-            displayController.updateProjectTaskDisplays();
+            const projectTabs = document.querySelectorAll('.project-tab');
+            projectTabs.forEach(tab => tab.classList.remove('active'));
+            target.classList.add('active');
+
+            const taskProjectIndex = target.dataset.number;
+            const projectNameIndex = projectManager.getProjectNameIndex(taskProjectIndex);
+
+            const projectTasksArray = taskManager.getProjectTasksArray(taskProjectIndex);
+            
+            displayController.updateProjectTaskDisplays(projectTasksArray, projectNameIndex);
 
         }
 
@@ -376,14 +446,14 @@ const displayController = (() => {
 
 
 
-    function createNewTaskObject() {
+    function createNewTaskObject(projectName, projectIndex) {
 
         const taskTitleValue = document.querySelector('.task-title-input').value;
         const taskDescriptionValue = document.querySelector('.task-description-input').value;
         const dueDateValue = document.querySelector('.due-date-input').value;
         const priorityValue = document.querySelector('.priority-input').value;
 
-        return taskManager.createTaskItem(taskTitleValue, taskDescriptionValue, dueDateValue, priorityValue);
+        return taskManager.createTaskItem(taskTitleValue, taskDescriptionValue, dueDateValue, priorityValue, projectName, projectIndex);
 
     }
 
@@ -391,6 +461,19 @@ const displayController = (() => {
 
         const newProjectNameValue = document.querySelector('.project-name').value;
         return projectManager.createProjectObject(newProjectNameValue);
+
+    }
+
+    function getProjectName() {
+
+        return projectNameInput.value;
+
+    }
+
+    function getProjectIndex() {
+
+        const projectIndex = projectNameInput.selectedIndex;
+        return projectIndex;
 
     }
 

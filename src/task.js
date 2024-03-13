@@ -7,11 +7,11 @@ export const taskManager = (() => {
     let thisWeekTasksArray = [];
     let completeTasksArray = [];
 
-    const createTaskItem = function (title, description, dueDate, priority) {
+    const createTaskItem = function (title, description, dueDate, priority, projectName, projectIndex) {
 
         const formattedDueDate = formateDate(dueDate);
 
-        return { title, description, formattedDueDate, priority, complete: false };
+        return { title, description, formattedDueDate, priority, complete: false, projectName, projectIndex };
     }
 
     const updateAllArrays = function () {
@@ -26,7 +26,7 @@ export const taskManager = (() => {
 
         for (let i = 0; i < inboxTasksArray.length; i++) {
 
-            inboxTasksArray[i].id = i;
+            inboxTasksArray[i].taskIndex = i;
             console.log(inboxTasksArray[i]);
 
             if (inboxTasksArray[i].formattedDueDate === dateFns.format(new Date(), 'dd MMMM yyyy')) {
@@ -54,13 +54,15 @@ export const taskManager = (() => {
 
     };
 
-    const getInboxTaskArray = () => inboxTasksArray;
+    const getInboxTaskArray = () => inboxTasksArray.filter(task => task.projectIndex == 0);
 
     const getTodayTasksArray = () => todayTasksArray;
 
     const getThisWeekTasksArray = () => thisWeekTasksArray;
 
     const getCompleteTasksArray = () => completeTasksArray;
+
+    const getProjectTasksArray = (projectIndex) => inboxTasksArray.filter(task => task.projectIndex == projectIndex);
 
     const addTaskItemToArray = (task) => inboxTasksArray.push(task);
 
@@ -75,8 +77,8 @@ export const taskManager = (() => {
 
     const formateDate = (dueDate) => dueDate === "" ? "" : dateFns.format(dueDate, 'dd MMMM yyyy');
 
-    return { createTaskItem, updateAllArrays, getInboxTaskArray, addTaskItemToArray, getTodayTasksArray, getThisWeekTasksArray, toggleTaskCompleteStatus, getCompleteTasksArray };
-
+    return { createTaskItem, updateAllArrays, getInboxTaskArray, addTaskItemToArray, getTodayTasksArray, getThisWeekTasksArray, toggleTaskCompleteStatus, getCompleteTasksArray, getProjectTasksArray };
+    
 })();
 
 //create an inbox array and push the task item into the array

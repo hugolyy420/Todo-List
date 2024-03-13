@@ -29,7 +29,9 @@ export const projectManager = (() => {
 
     const getEachProjectName = () => projectsArray.map(project => project.name);
 
-    return {createProjectObject, getProjectArray, addProjectObjectToArray, getEachProjectName};
+    const getProjectNameIndex = (index) => index - 1;
+
+    return {createProjectObject, getProjectArray, addProjectObjectToArray, getEachProjectName, getProjectNameIndex};
 
 })();
 

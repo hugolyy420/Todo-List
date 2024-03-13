@@ -73,6 +73,7 @@ header {
 	border: 1px solid;
 	padding: 0.5em;
 	gap: 1em;
+	border-radius: 10px;
 }
 
 .task-title {
@@ -91,4 +92,10 @@ header {
 
 .project-tab-name {
 	flex: 1;
+}
+
+.tasks-container {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2em;
 }
