@@ -315,7 +315,7 @@ const displayController = (() => {
 
     function updateProjectSelections() {
 
-        const projectOptionsContainer = document.querySelector('.project-name-input');
+        const projectOptionsContainer = document.querySelector('.project-name-select');
 
         projectOptionsContainer.innerHTML = `<option value="Inbox">Inbox</option>`
 
@@ -352,6 +352,7 @@ const displayController = (() => {
     const completeNavButton = document.querySelector('.complete');
     const tasksContainer = document.querySelector('.tasks-container');
     const navBar = document.querySelector('.nav-bar');
+    const projectNameSelect = document.querySelector('.project-name-select');
     const projectNameInput = document.querySelector('.project-name-input');
 
 
@@ -411,7 +412,7 @@ const displayController = (() => {
 
         };
 
-        // if inbox project name input and in project tab
+        // if inbox project name input and in project tab`
         // get current tab index (active class)
 
         if (projectIndex == 0 && displayController.isProjectTab()) {
@@ -494,15 +495,34 @@ const displayController = (() => {
 
     navBar.addEventListener('click', event => {
 
-        const target = event.target.closest('.project-tab');
+        const target = event.target;
+        const projectElement = event.target.closest('.project-tab');
 
-        if (target) {
+        if (target.classList.contains('project-edit-button')) {
+
+            addProjectDialog.showModal();
+
+            const projectTab = target.parentElement;
+            const projectIndex = projectTab.dataset.number;
+            const projectName = projectManager.getProjectNameByProjectIndex(projectIndex);
+
+            projectNameInput.value = projectName;
+            // const projectNameElement = projectTab.querySelector('.project-tab-name');
+            // const projectName = projectNameElement.textContent;
+
+            //print activeProjectTab name to input field
+            //when submitted change the project name in the project object
+            //pass the project array to displaycontroller to render again
+
+        }
+
+        if (projectElement) {
 
             const projectTabs = document.querySelectorAll('.project-tab');
             projectTabs.forEach(tab => tab.classList.remove('active'));
-            target.classList.add('active');
+            projectElement.classList.add('active');
 
-            const taskProjectIndex = target.dataset.number;
+            const taskProjectIndex = projectElement.dataset.number;
             const projectNameIndex = projectManager.getProjectNameIndex(taskProjectIndex);
 
             const projectTasksArray = taskManager.getProjectTasksArray(taskProjectIndex);
@@ -536,20 +556,20 @@ const displayController = (() => {
 
     function createNewProjectObject() {
 
-        const newProjectNameValue = document.querySelector('.project-name').value;
+        const newProjectNameValue = document.querySelector('.project-name-input').value;
         return projectManager.createProjectObject(newProjectNameValue);
 
     }
 
     function getProjectName() {
 
-        return projectNameInput.value;
+        return projectNameSelect.value;
 
     }
 
     function getProjectIndex() {
 
-        const projectIndex = projectNameInput.selectedIndex;
+        const projectIndex = projectNameSelect.selectedIndex;
         return projectIndex;
 
     }
