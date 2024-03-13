@@ -54,7 +54,20 @@ export const taskManager = (() => {
 
     };
 
-    const getInboxTaskArray = () => inboxTasksArray.filter(task => task.projectIndex == 0);
+    const getInboxTasks = () => inboxTasksArray.filter(task => task.projectIndex == 0);
+    
+    const getTaskDetails = function (taskIndex) {
+
+        const taskObject = inboxTasksArray[taskIndex];
+        const detailsArray = [
+            { label: 'Title', value: taskObject.title },
+            { label: 'Description', value: taskObject.description },
+            { label: 'Due Date', value: taskObject.formattedDueDate },
+            { label: 'Priority', value: taskObject.priority }
+        ];
+        return detailsArray;
+
+    } 
 
     const getTodayTasksArray = () => todayTasksArray;
 
@@ -77,7 +90,7 @@ export const taskManager = (() => {
 
     const formateDate = (dueDate) => dueDate === "" ? "" : dateFns.format(dueDate, 'dd MMMM yyyy');
 
-    return { createTaskItem, updateAllArrays, getInboxTaskArray, addTaskItemToArray, getTodayTasksArray, getThisWeekTasksArray, toggleTaskCompleteStatus, getCompleteTasksArray, getProjectTasksArray };
+    return { createTaskItem, updateAllArrays, getInboxTasks, addTaskItemToArray, getTodayTasksArray, getThisWeekTasksArray, toggleTaskCompleteStatus, getCompleteTasksArray, getProjectTasksArray, getTaskDetails };
     
 })();
 

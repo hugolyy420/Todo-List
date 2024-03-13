@@ -106,7 +106,7 @@ const domElementsCreator = (() => {
 
     }
 
-    function createProjectOptionElements (array) {
+    function createProjectOptionElements(array) {
 
         const projectOptionElementsArray = [];
 
@@ -126,7 +126,35 @@ const domElementsCreator = (() => {
 
     }
 
-    return { createTaskElements, createProjectElements, createProjectOptionElements };
+    function createTaskDetailsElement(taskDetails) {
+
+        const detailContainer = document.createElement('div');
+        detailContainer.classList.add('detail-container');
+
+        taskDetails.forEach(taskDetail => {
+
+            const detailGroup = document.createElement('div');
+            const detailLabel = document.createElement('div');
+            const detailValue = document.createElement('div');
+
+            detailGroup.classList.add('detail-group');
+            detailLabel.classList.add('detail-label');
+            detailValue.classList.add('detail-value');
+
+            detailLabel.textContent = taskDetail.label + ':';
+            detailValue.textContent = taskDetail.value;
+
+            detailGroup.appendChild(detailLabel);
+            detailGroup.appendChild(detailValue);
+
+            detailContainer.appendChild(detailGroup);
+
+        })
+
+        return detailContainer;
+    }
+
+    return { createTaskElements, createProjectElements, createProjectOptionElements, createTaskDetailsElement };
 
 })();
 
@@ -171,6 +199,13 @@ const displayController = (() => {
 
     };
 
+    function renderTaskDetails(taskDetails, taskElement) {
+
+        const detailsElementToBeDisplayed = domElementsCreator.createTaskDetailsElement(taskDetails);
+        taskElement.after(detailsElementToBeDisplayed);
+
+    }
+
     function checkRenderingCondition(projectTasksArray, projectNameIndex) {
 
         if (inboxTab) {
@@ -206,8 +241,8 @@ const displayController = (() => {
         projectTab = false;
 
         taskManager.updateAllArrays();
-        const inboxTasksArray = taskManager.getInboxTaskArray();
-        
+        const inboxTasksArray = taskManager.getInboxTasks();
+
         taskDisplayHeading.textContent = 'Inbox';
         renderTasksDisplay(inboxTasksArray, completeTab);
 
@@ -261,7 +296,7 @@ const displayController = (() => {
 
     }
 
-    function updateProjectTaskDisplays (projectTasksArray, projectNameIndex) {
+    function updateProjectTaskDisplays(projectTasksArray, projectNameIndex) {
 
         projectTab = true;
         todayTab = false;
@@ -278,7 +313,7 @@ const displayController = (() => {
 
     }
 
-    function updateProjectSelections () {
+    function updateProjectSelections() {
 
         const projectOptionsContainer = document.querySelector('.project-name-input');
 
@@ -298,7 +333,7 @@ const displayController = (() => {
 
     const isProjectTab = () => projectTab;
 
-    return { renderTasksDisplay, updateInboxTasksDisplay, updateThisWeekTasksDisplay, updateTodayTasksDisplay, updateCompleteTasksDisplay, checkRenderingCondition, renderProjectsDisplay, updateProjectSelections, updateProjectTaskDisplays, isProjectTab };
+    return { renderTasksDisplay, updateInboxTasksDisplay, updateThisWeekTasksDisplay, updateTodayTasksDisplay, updateCompleteTasksDisplay, checkRenderingCondition, renderProjectsDisplay, updateProjectSelections, updateProjectTaskDisplays, isProjectTab, renderTaskDetails };
 
 })();
 
@@ -361,10 +396,12 @@ const displayController = (() => {
         const newTask = createNewTaskObject(projectName, projectIndex);
         taskManager.addTaskItemToArray(newTask);
 
-        
+
 
         if (projectIndex !== 0) {
 
+            const activeProjectTab = document.querySelector('.active');
+            projectIndex = activeProjectTab.dataset.number; 
             projectTasksArray = taskManager.getProjectTasksArray(projectIndex);
             projectIndex--;
             displayController.checkRenderingCondition(projectTasksArray, projectIndex);
@@ -372,17 +409,17 @@ const displayController = (() => {
             taskForm.reset();
             return;
 
-       };
+        };
 
-       // if inbox project name input and in project tab
+        // if inbox project name input and in project tab
         // get current tab index (active class)
 
-       if (projectIndex == 0 && displayController.isProjectTab()) {
+        if (projectIndex == 0 && displayController.isProjectTab()) {
 
             addTaskDialog.close();
             taskForm.reset();
             return;
-       }
+        }
 
         displayController.checkRenderingCondition();
         addTaskDialog.close();
@@ -393,13 +430,15 @@ const displayController = (() => {
     tasksContainer.addEventListener('click', event => {
 
         const target = event.target;
+        const taskItem = target.parentElement;
+        const classNames = ['task-check-button', 'task-edit-button', 'task-delete-button'];
 
         if (target.classList.contains('task-check-button')) {
 
             taskManager.toggleTaskCompleteStatus(target.parentElement);
 
             if (displayController.isProjectTab()) {
-                
+
                 const activeProjectTab = document.querySelector('.active');
                 let projectIndex = activeProjectTab.dataset.number;
                 let projectTasksArray = taskManager.getProjectTasksArray(projectIndex);
@@ -410,6 +449,44 @@ const displayController = (() => {
             }
 
             displayController.checkRenderingCondition();
+
+        }
+
+        if (taskItem.classList.contains('task-item') && !(classNames.some(className => target.classList.contains(className)))) {
+
+            const taskIndex = taskItem.dataset.number;
+            const taskItemElement = taskItem;
+            const detailsContainer = taskItemElement.nextElementSibling;
+
+            if (detailsContainer && detailsContainer.classList.contains('detail-container')) {
+
+                detailsContainer.remove();
+
+            } else {
+
+                const taskDetails = taskManager.getTaskDetails(taskIndex);
+                displayController.renderTaskDetails(taskDetails, taskItemElement);
+
+            }
+
+        }
+
+        if (target.classList.contains('task-item')) {
+
+            const taskIndex = target.dataset.number;
+            const taskItemElement = target;
+            const detailsContainer = taskItemElement.nextElementSibling;
+
+            if (detailsContainer && detailsContainer.classList.contains('detail-container')) {
+
+                detailsContainer.remove();
+
+            } else {
+
+                const taskDetails = taskManager.getTaskDetails(taskIndex);
+                displayController.renderTaskDetails(taskDetails, taskItemElement);
+
+            }
 
         }
 
@@ -429,7 +506,7 @@ const displayController = (() => {
             const projectNameIndex = projectManager.getProjectNameIndex(taskProjectIndex);
 
             const projectTasksArray = taskManager.getProjectTasksArray(taskProjectIndex);
-            
+
             displayController.updateProjectTaskDisplays(projectTasksArray, projectNameIndex);
 
         }
