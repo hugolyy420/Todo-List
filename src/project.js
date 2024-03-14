@@ -16,7 +16,7 @@ export const projectManager = (() => {
         const projectObject = {
 
             name : projectName,
-            tasks : []
+            edit : false
 
         }
         return projectObject;
@@ -33,7 +33,16 @@ export const projectManager = (() => {
 
     const getProjectNameIndex = (index) => index - 1;
 
-    return {createProjectObject, getProjectArray, addProjectObjectToArray, getEachProjectName, getProjectNameIndex, getProjectNameByProjectIndex};
+    const setProjectObjectToEditMode = (projectIndex) => projectsArray[projectIndex - 1].edit = true;
+
+    const setNewProjectName = function (NewprojectName) {
+
+        const projectObjectInEditMode = projectsArray.find(project => project.edit)
+        projectObjectInEditMode.name = NewprojectName;
+
+    }
+
+    return {createProjectObject, getProjectArray, addProjectObjectToArray, getEachProjectName, getProjectNameIndex, getProjectNameByProjectIndex, setProjectObjectToEditMode, setNewProjectName};
 
 })();
 

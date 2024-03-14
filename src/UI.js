@@ -354,6 +354,7 @@ const displayController = (() => {
     const navBar = document.querySelector('.nav-bar');
     const projectNameSelect = document.querySelector('.project-name-select');
     const projectNameInput = document.querySelector('.project-name-input');
+    let projectEditMode = false;
 
 
     addTaskButton.addEventListener('click', () => {
@@ -372,17 +373,34 @@ const displayController = (() => {
 
         event.preventDefault();
 
-        const newProject = createNewProjectObject();
-        projectManager.addProjectObjectToArray(newProject);
+        if (projectEditMode) {
 
-        const newProjectsArray = projectManager.getProjectArray();
-        displayController.renderProjectsDisplay(newProjectsArray);
+            const newProjectName = projectNameInput.value;
+            projectManager.setNewProjectName(newProjectName);
 
-        displayController.updateProjectSelections();
+            const newProjectsArray = projectManager.getProjectArray();
+            displayController.renderProjectsDisplay(newProjectsArray);
 
-        addProjectDialog.close();
-        projectForm.reset();
+            displayController.updateProjectSelections();
 
+            addProjectDialog.close();
+            projectForm.reset();
+            projectEditMode = false;
+
+        } else {
+
+            const newProject = createNewProjectObject();
+            projectManager.addProjectObjectToArray(newProject);
+
+            const newProjectsArray = projectManager.getProjectArray();
+            displayController.renderProjectsDisplay(newProjectsArray);
+
+            displayController.updateProjectSelections();
+
+            addProjectDialog.close();
+            projectForm.reset();
+
+        }
 
     })
 
@@ -402,14 +420,28 @@ const displayController = (() => {
         if (projectIndex !== 0) {
 
             const activeProjectTab = document.querySelector('.active');
-            projectIndex = activeProjectTab.dataset.number; 
-            projectTasksArray = taskManager.getProjectTasksArray(projectIndex);
-            projectIndex--;
-            displayController.checkRenderingCondition(projectTasksArray, projectIndex);
-            addTaskDialog.close();
-            taskForm.reset();
-            return;
 
+            if (activeProjectTab) {
+
+                projectIndex = activeProjectTab.dataset.number; 
+                projectTasksArray = taskManager.getProjectTasksArray(projectIndex);
+                projectIndex--;
+                displayController.checkRenderingCondition(projectTasksArray, projectIndex);
+                addTaskDialog.close();
+                taskForm.reset();
+                return;
+
+            } else {
+                
+                projectTasksArray = taskManager.getProjectTasksArray(projectIndex);
+                projectIndex--;
+                displayController.checkRenderingCondition(projectTasksArray, projectIndex);
+                addTaskDialog.close();
+                taskForm.reset();
+                return;
+
+            }
+ 
         };
 
         // if inbox project name input and in project tab`
@@ -501,12 +533,15 @@ const displayController = (() => {
         if (target.classList.contains('project-edit-button')) {
 
             addProjectDialog.showModal();
+            projectEditMode = true;
 
             const projectTab = target.parentElement;
             const projectIndex = projectTab.dataset.number;
+            projectManager.setProjectObjectToEditMode(projectIndex)
             const projectName = projectManager.getProjectNameByProjectIndex(projectIndex);
 
             projectNameInput.value = projectName;
+            return;
             // const projectNameElement = projectTab.querySelector('.project-tab-name');
             // const projectName = projectNameElement.textContent;
 
