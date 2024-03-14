@@ -333,7 +333,14 @@ const displayController = (() => {
 
     const isProjectTab = () => projectTab;
 
-    return { renderTasksDisplay, updateInboxTasksDisplay, updateThisWeekTasksDisplay, updateTodayTasksDisplay, updateCompleteTasksDisplay, checkRenderingCondition, renderProjectsDisplay, updateProjectSelections, updateProjectTaskDisplays, isProjectTab, renderTaskDetails };
+    function removeTasksDisplay () {
+
+        tasksContainer.textContent = "";
+        taskDisplayHeading.textContent = "";
+
+    }
+
+    return { renderTasksDisplay, updateInboxTasksDisplay, updateThisWeekTasksDisplay, updateTodayTasksDisplay, updateCompleteTasksDisplay, checkRenderingCondition, renderProjectsDisplay, updateProjectSelections, updateProjectTaskDisplays, isProjectTab, renderTaskDetails, removeTasksDisplay };
 
 })();
 
@@ -432,7 +439,7 @@ const displayController = (() => {
                 return;
 
             } else {
-                
+
                 projectTasksArray = taskManager.getProjectTasksArray(projectIndex);
                 projectIndex--;
                 displayController.checkRenderingCondition(projectTasksArray, projectIndex);
@@ -542,12 +549,23 @@ const displayController = (() => {
 
             projectNameInput.value = projectName;
             return;
-            // const projectNameElement = projectTab.querySelector('.project-tab-name');
-            // const projectName = projectNameElement.textContent;
 
-            //print activeProjectTab name to input field
-            //when submitted change the project name in the project object
-            //pass the project array to displaycontroller to render again
+        }
+
+        if (target.classList.contains('project-delete-button')) {
+
+            const projectTab = target.parentElement;
+            const projectIndex = projectTab.dataset.number;
+            projectManager.deleteProjectByProjectIndex(projectIndex);
+            taskManager.deleteTasksByProjectIndex(projectIndex);
+            taskManager.updateAllArrays();
+
+            const newProjectsArray = projectManager.getProjectArray();
+            displayController.renderProjectsDisplay(newProjectsArray);
+            displayController.updateProjectSelections();
+
+            displayController.removeTasksDisplay();
+            return;
 
         }
 

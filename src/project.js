@@ -42,7 +42,9 @@ export const projectManager = (() => {
 
     }
 
-    return {createProjectObject, getProjectArray, addProjectObjectToArray, getEachProjectName, getProjectNameIndex, getProjectNameByProjectIndex, setProjectObjectToEditMode, setNewProjectName};
+    const deleteProjectByProjectIndex = (projectIndex) => projectsArray.splice(projectIndex - 1, 1);
+
+    return {createProjectObject, getProjectArray, addProjectObjectToArray, getEachProjectName, getProjectNameIndex, getProjectNameByProjectIndex, setProjectObjectToEditMode, setNewProjectName, deleteProjectByProjectIndex};
 
 })();
 

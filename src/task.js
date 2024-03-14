@@ -19,7 +19,7 @@ export const taskManager = (() => {
         todayTasksArray = [];
         thisWeekTasksArray = [];
         completeTasksArray = [];
-        
+    
         const seventhDay = new Date ();
         seventhDay.setDate(seventhDay.getDate() + 7);
 
@@ -51,6 +51,8 @@ export const taskManager = (() => {
             }
 
         }
+
+        console.log(inboxTasksArray);
 
     };
 
@@ -90,7 +92,17 @@ export const taskManager = (() => {
 
     const formateDate = (dueDate) => dueDate === "" ? "" : dateFns.format(dueDate, 'dd MMMM yyyy');
 
-    return { createTaskItem, updateAllArrays, getInboxTasks, addTaskItemToArray, getTodayTasksArray, getThisWeekTasksArray, toggleTaskCompleteStatus, getCompleteTasksArray, getProjectTasksArray, getTaskDetails };
+    const deleteTasksByProjectIndex = (projectIndex) => inboxTasksArray.forEach((task, index) => {
+
+        if (task.projectIndex == projectIndex) {
+
+            inboxTasksArray.splice(index, 1);
+
+        }
+
+    });
+
+    return { createTaskItem, updateAllArrays, getInboxTasks, addTaskItemToArray, getTodayTasksArray, getThisWeekTasksArray, toggleTaskCompleteStatus, getCompleteTasksArray, getProjectTasksArray, getTaskDetails, deleteTasksByProjectIndex };
     
 })();
 
