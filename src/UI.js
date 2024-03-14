@@ -308,8 +308,18 @@ const displayController = (() => {
         const projectNameList = projectManager.getEachProjectName();
         const projectName = projectNameList[projectNameIndex];
 
-        taskDisplayHeading.textContent = projectName;
-        renderTasksDisplay(projectTasksArray, completeTab);
+        if (projectName) {
+
+            taskDisplayHeading.textContent = projectName;
+            renderTasksDisplay(projectTasksArray, completeTab);
+
+        } else {
+
+            removeTasksDisplay();
+
+        }
+
+       
 
     }
 
@@ -564,7 +574,7 @@ const displayController = (() => {
             displayController.renderProjectsDisplay(newProjectsArray);
             displayController.updateProjectSelections();
 
-            displayController.removeTasksDisplay();
+            displayController.checkRenderingCondition();
             return;
 
         }
