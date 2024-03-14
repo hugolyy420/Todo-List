@@ -113,3 +113,9 @@ header {
 	display: flex;
 	gap: 0.3em;
 }
+
+.active {
+
+	background-color: #bdbdbd;
+
+}

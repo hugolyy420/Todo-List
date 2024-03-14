@@ -9,9 +9,10 @@ export const taskManager = (() => {
 
     const createTaskItem = function (title, description, dueDate, priority, projectName, projectIndex) {
 
+        console.log(dueDate);
         const formattedDueDate = formateDate(dueDate);
 
-        return { title, description, formattedDueDate, priority, complete: false, projectName, projectIndex };
+        return { title, description, formattedDueDate, priority, complete: false, edit: false, projectName, projectIndex };
     }
 
     const updateAllArrays = function () {
@@ -71,6 +72,23 @@ export const taskManager = (() => {
 
     } 
 
+    const getTaskEditDetails = function (taskIndex) {
+
+        const taskObject = inboxTasksArray[taskIndex];
+        const formattedDueDate = taskObject.formattedDueDate !== "" ? dateFns.format(taskObject.formattedDueDate, 'yyyy-MM-dd') : "";
+
+        const detailsArray = [
+            { value: taskObject.title },
+            { value: taskObject.description },
+            { value: formattedDueDate },
+            { value: taskObject.priority },
+            { value: taskObject.projectName }
+        ];
+        console.log (detailsArray);
+        return detailsArray;
+
+    }
+
     const getTodayTasksArray = () => todayTasksArray;
 
     const getThisWeekTasksArray = () => thisWeekTasksArray;
@@ -102,7 +120,20 @@ export const taskManager = (() => {
 
     });
 
-    return { createTaskItem, updateAllArrays, getInboxTasks, addTaskItemToArray, getTodayTasksArray, getThisWeekTasksArray, toggleTaskCompleteStatus, getCompleteTasksArray, getProjectTasksArray, getTaskDetails, deleteTasksByProjectIndex };
+    const getTaskProjectIndex = (taskIndex) => inboxTasksArray[taskIndex].projectIndex;
+
+    const setTaskToEditMode = (taskIndex => inboxTasksArray[taskIndex].edit = true);
+
+    const getTaskObjectInEditMode = () => inboxTasksArray.find(task => task.edit);
+
+    const updateTaskDetails = function (newTaskObject) {
+
+        const taskIndex = inboxTasksArray.findIndex(task => task.edit);
+        inboxTasksArray[taskIndex] = newTaskObject;
+
+    }
+
+    return { createTaskItem, updateAllArrays, getInboxTasks, addTaskItemToArray, getTodayTasksArray, getThisWeekTasksArray, toggleTaskCompleteStatus, getCompleteTasksArray, getProjectTasksArray, getTaskDetails, deleteTasksByProjectIndex, getTaskEditDetails, getTaskProjectIndex, setTaskToEditMode, getTaskObjectInEditMode, updateTaskDetails };
     
 })();
 

@@ -66,12 +66,6 @@ const domElementsCreator = (() => {
 
     function createProjectElements(array) {
 
-        //create an array to contain all project elements to be displayed
-        //create elements one by one
-        //for loop to extract project name and push it into textContent
-        //push the finished element into array
-        //return the array
-
         const projectElementsToBeDisplayed = [];
         const projectTabIconClassList = ['fa-solid', 'fa-list-check', 'project-tab-icon'];
         const projectTabEditButtonClassList = ['fa-regular', 'fa-pen-to-square', 'project-edit-button'];
@@ -372,6 +366,7 @@ const displayController = (() => {
     const projectNameSelect = document.querySelector('.project-name-select');
     const projectNameInput = document.querySelector('.project-name-input');
     let projectEditMode = false;
+    let taskEditMode = false;
 
 
     addTaskButton.addEventListener('click', () => {
@@ -393,12 +388,28 @@ const displayController = (() => {
         if (projectEditMode) {
 
             const newProjectName = projectNameInput.value;
+            // const activeProjectTab = document.querySelector('.active');
+            // let activeProjectTabInbex 
+
+            // if (activeProjectTab) {
+
+            //     activeProjectTabInbex = activeProjectTab.dataset.number;
+
+            // }
+
+            let editModeProjectTabIndex = projectManager.getEditModeProjectIndex();
+
             projectManager.setNewProjectName(newProjectName);
 
             const newProjectsArray = projectManager.getProjectArray();
             displayController.renderProjectsDisplay(newProjectsArray);
 
             displayController.updateProjectSelections();
+
+            const projectTasksArray = taskManager.getProjectTasksArray(editModeProjectTabIndex);
+            editModeProjectTabIndex--;
+
+            displayController.checkRenderingCondition(projectTasksArray, editModeProjectTabIndex);
 
             addProjectDialog.close();
             projectForm.reset();
@@ -413,6 +424,7 @@ const displayController = (() => {
             displayController.renderProjectsDisplay(newProjectsArray);
 
             displayController.updateProjectSelections();
+            displayController.updateProjectTaskDisplays([], newProjectsArray.length - 1);
 
             addProjectDialog.close();
             projectForm.reset();
@@ -425,55 +437,66 @@ const displayController = (() => {
 
         event.preventDefault();
 
-        const projectName = getProjectName();
+        let projectName = getProjectName();
         let projectIndex = getProjectIndex();
         let projectTasksArray;
 
-        const newTask = createNewTaskObject(projectName, projectIndex);
-        taskManager.addTaskItemToArray(newTask);
+        if (taskEditMode) {
 
+            const newTaskObject = createNewTaskObject(projectName, projectIndex);
+            taskManager.updateTaskDetails(newTaskObject);
 
+            if (projectIndex == 0) {
 
-        if (projectIndex !== 0) {
-
-            const activeProjectTab = document.querySelector('.active');
-
-            if (activeProjectTab) {
-
-                projectIndex = activeProjectTab.dataset.number; 
-                projectTasksArray = taskManager.getProjectTasksArray(projectIndex);
-                projectIndex--;
-                displayController.checkRenderingCondition(projectTasksArray, projectIndex);
+                displayController.updateInboxTasksDisplay();
                 addTaskDialog.close();
                 taskForm.reset();
+                taskEditMode = false;
                 return;
 
             } else {
 
                 projectTasksArray = taskManager.getProjectTasksArray(projectIndex);
                 projectIndex--;
-                displayController.checkRenderingCondition(projectTasksArray, projectIndex);
+                displayController.updateProjectTaskDisplays(projectTasksArray, projectIndex);
                 addTaskDialog.close();
                 taskForm.reset();
+                taskEditMode = false;
                 return;
 
             }
+            
+        }
+
+        if (projectIndex !== 0) {
+
+            const newTask = createNewTaskObject(projectName, projectIndex);
+            taskManager.addTaskItemToArray(newTask);
+            projectTasksArray = taskManager.getProjectTasksArray(projectIndex);
+            projectIndex--;
+            displayController.updateProjectTaskDisplays(projectTasksArray, projectIndex);
+            addTaskDialog.close();
+            taskForm.reset();
+            return;
  
         };
 
         // if inbox project name input and in project tab`
         // get current tab index (active class)
 
-        if (projectIndex == 0 && displayController.isProjectTab()) {
+        if (projectIndex == 0) {
 
+            const newTask = createNewTaskObject(projectName, projectIndex);
+            taskManager.addTaskItemToArray(newTask);
+            displayController.updateInboxTasksDisplay();
             addTaskDialog.close();
             taskForm.reset();
             return;
         }
 
-        displayController.checkRenderingCondition();
-        addTaskDialog.close();
-        taskForm.reset();
+        // displayController.checkRenderingCondition();
+        // addTaskDialog.close();
+        // taskForm.reset();
 
     })
 
@@ -489,8 +512,9 @@ const displayController = (() => {
 
             if (displayController.isProjectTab()) {
 
-                const activeProjectTab = document.querySelector('.active');
-                let projectIndex = activeProjectTab.dataset.number;
+                const taskElement = target.parentElement;
+                const taskIndex = taskElement.dataset.number;
+                let projectIndex = taskManager.getTaskProjectIndex(taskIndex);
                 let projectTasksArray = taskManager.getProjectTasksArray(projectIndex);
                 projectIndex--;
                 displayController.checkRenderingCondition(projectTasksArray, projectIndex);
@@ -499,6 +523,27 @@ const displayController = (() => {
             }
 
             displayController.checkRenderingCondition();
+            return;
+
+        }
+
+        if (target.classList.contains('task-edit-button')) {
+
+            addTaskDialog.showModal();
+            taskEditMode = true;
+
+            const taskIndex = taskItem.dataset.number;
+            taskManager.setTaskToEditMode(taskIndex);
+            const taskInputFieldsList = document.querySelectorAll('.task-input-field');
+            const taskEditDetails = taskManager.getTaskEditDetails(taskIndex);
+
+            for (let i = 0; i < taskInputFieldsList.length; i++) {
+
+                taskInputFieldsList[i].value = taskEditDetails[i].value;
+
+            }
+            
+            return;
 
         }
 
@@ -571,19 +616,22 @@ const displayController = (() => {
             taskManager.updateAllArrays();
 
             const newProjectsArray = projectManager.getProjectArray();
-            displayController.renderProjectsDisplay(newProjectsArray);
+
             displayController.updateProjectSelections();
 
-            displayController.checkRenderingCondition();
+            displayController.renderProjectsDisplay(newProjectsArray);
+            
+
+            //if projectTabMode and target tab active => check rendering 
+            // if projectTabMobe and target tab not active => no need rendering 
+            
+
+            displayController.updateInboxTasksDisplay();
             return;
 
         }
 
         if (projectElement) {
-
-            const projectTabs = document.querySelectorAll('.project-tab');
-            projectTabs.forEach(tab => tab.classList.remove('active'));
-            projectElement.classList.add('active');
 
             const taskProjectIndex = projectElement.dataset.number;
             const projectNameIndex = projectManager.getProjectNameIndex(taskProjectIndex);

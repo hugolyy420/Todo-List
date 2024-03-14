@@ -33,18 +33,21 @@ export const projectManager = (() => {
 
     const getProjectNameIndex = (index) => index - 1;
 
+    const getEditModeProjectIndex = () => projectsArray.findIndex(project => project.edit) + 1;
+
     const setProjectObjectToEditMode = (projectIndex) => projectsArray[projectIndex - 1].edit = true;
 
     const setNewProjectName = function (NewprojectName) {
 
         const projectObjectInEditMode = projectsArray.find(project => project.edit)
         projectObjectInEditMode.name = NewprojectName;
+        projectObjectInEditMode.edit = false;
 
     }
 
     const deleteProjectByProjectIndex = (projectIndex) => projectsArray.splice(projectIndex - 1, 1);
 
-    return {createProjectObject, getProjectArray, addProjectObjectToArray, getEachProjectName, getProjectNameIndex, getProjectNameByProjectIndex, setProjectObjectToEditMode, setNewProjectName, deleteProjectByProjectIndex};
+    return {createProjectObject, getProjectArray, addProjectObjectToArray, getEachProjectName, getProjectNameIndex, getProjectNameByProjectIndex, setProjectObjectToEditMode, setNewProjectName, deleteProjectByProjectIndex, getEditModeProjectIndex};
 
 })();
 
