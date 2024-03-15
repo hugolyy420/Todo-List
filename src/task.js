@@ -120,6 +120,8 @@ export const taskManager = (() => {
 
     });
 
+    const deleteTaskByTaskIndex = (taskIndex) => inboxTasksArray.splice(taskIndex, 1);
+
     const getTaskProjectIndex = (taskIndex) => inboxTasksArray[taskIndex].projectIndex;
 
     const setTaskToEditMode = (taskIndex => inboxTasksArray[taskIndex].edit = true);
@@ -133,7 +135,7 @@ export const taskManager = (() => {
 
     }
 
-    return { createTaskItem, updateAllArrays, getInboxTasks, addTaskItemToArray, getTodayTasksArray, getThisWeekTasksArray, toggleTaskCompleteStatus, getCompleteTasksArray, getProjectTasksArray, getTaskDetails, deleteTasksByProjectIndex, getTaskEditDetails, getTaskProjectIndex, setTaskToEditMode, getTaskObjectInEditMode, updateTaskDetails };
+    return { createTaskItem, updateAllArrays, getInboxTasks, addTaskItemToArray, getTodayTasksArray, getThisWeekTasksArray, toggleTaskCompleteStatus, getCompleteTasksArray, getProjectTasksArray, getTaskDetails, deleteTasksByProjectIndex, getTaskEditDetails, getTaskProjectIndex, setTaskToEditMode, getTaskObjectInEditMode, updateTaskDetails, deleteTaskByTaskIndex };
     
 })();
 

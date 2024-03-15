@@ -547,6 +547,18 @@ const displayController = (() => {
 
         }
 
+        if (target.classList.contains('task-delete-button')) {
+
+            const taskIndex = taskItem.dataset.number;
+            let projectIndex = taskManager.getTaskProjectIndex(taskIndex);
+            taskManager.deleteTaskByTaskIndex(taskIndex);
+            taskManager.updateAllArrays();
+            const projectTasksArray = taskManager.getProjectTasksArray(projectIndex);
+            projectIndex--;
+            displayController.checkRenderingCondition(projectTasksArray, projectIndex);
+
+        }
+
         if (taskItem.classList.contains('task-item') && !(classNames.some(className => target.classList.contains(className)))) {
 
             const taskIndex = taskItem.dataset.number;
