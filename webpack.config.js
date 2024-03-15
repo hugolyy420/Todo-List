@@ -27,10 +27,10 @@ module.exports = {
     },
     module: {
         rules: [
-            {
-                test: /\.css$/i,
-                use: ['style-loader', 'css-loader'],
-            },
+            // {
+            //     test: /\.css$/i,
+            //     use: ['style-loader', 'css-loader'],
+            // },
             {
                 test: /\.(png|svg|jpg|jpeg|gif)$/i,
                 type: 'asset/resource',
@@ -45,10 +45,10 @@ module.exports = {
                     filename: '[name].[ext]'
                 },
             },
-            // {
-            //     test: /.s?css$/,
-            //     use: [MiniCssExtractPlugin.loader, 'css-loader'],
-            //   },
+            {
+                test: /.s?css$/,
+                use: [MiniCssExtractPlugin.loader, 'css-loader'],
+              },
         ],
     },
     optimization: {

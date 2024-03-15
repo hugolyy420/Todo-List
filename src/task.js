@@ -10,7 +10,6 @@ export const taskManager = (() => {
 
     const createTaskItem = function (title, description, dueDate, priority, projectName, projectIndex) {
 
-        console.log(dueDate);
         const formattedDueDate = formateDate(dueDate);
 
         return { title, description, formattedDueDate, priority, complete: false, edit: false, projectName, projectIndex };
@@ -29,8 +28,7 @@ export const taskManager = (() => {
         for (let i = 0; i < inboxTasksArray.length; i++) {
 
             inboxTasksArray[i].taskIndex = i;
-            console.log(inboxTasksArray[i]);
-
+        
             if (inboxTasksArray[i].formattedDueDate === dateFns.format(new Date(), 'dd MMMM yyyy')) {
 
                 
@@ -83,7 +81,7 @@ export const taskManager = (() => {
             { value: taskObject.priority },
             { value: taskObject.projectName }
         ];
-        console.log (detailsArray);
+        
         return detailsArray;
 
     }

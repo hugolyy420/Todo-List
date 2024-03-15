@@ -324,7 +324,6 @@ const displayController = (() => {
         completeTab = false;
         
         const projectTabs = document.querySelectorAll('.project-tab');
-        console.log(projectTabs);
 
         if (projectTabs.length > 0) {
 
@@ -361,13 +360,6 @@ const displayController = (() => {
     }
 
     const isProjectTab = () => projectTab;
-
-    // function removeTasksDisplay () {
-
-    //     tasksContainer.textContent = "";
-    //     taskDisplayHeading.textContent = "";
-
-    // }
 
     function removeActiveClass () {
 
@@ -550,9 +542,6 @@ const displayController = (() => {
  
         };
 
-        // if inbox project name input and in project tab`
-        // get current tab index (active class)
-
         if (projectIndex == 0) {
 
             const newTask = createNewTaskObject(projectName, projectIndex);
@@ -562,10 +551,6 @@ const displayController = (() => {
             taskForm.reset();
             return;
         }
-
-        // displayController.checkRenderingCondition();
-        // addTaskDialog.close();
-        // taskForm.reset();
 
     })
 
