@@ -157,6 +157,7 @@ const displayController = (() => {
     const taskDisplayHeading = document.querySelector('.task-display-heading');
     const tasksContainer = document.querySelector('.tasks-container');
     const projectsContainer = document.querySelector('.project-container');
+    const navButtons = document.querySelectorAll('.nav-button');
 
     let inboxTab = true;
     let todayTab = false;
@@ -234,6 +235,8 @@ const displayController = (() => {
         completeTab = false;
         projectTab = false;
 
+        removeActiveClass();
+        navButtons[0].classList.add('active');
         taskManager.updateAllArrays();
         const inboxTasksArray = taskManager.getInboxTasks();
 
@@ -250,6 +253,8 @@ const displayController = (() => {
         completeTab = false;
         projectTab = false;
 
+        removeActiveClass();
+        navButtons[1].classList.add('active');
         taskManager.updateAllArrays();
         const todayTasksArray = taskManager.getTodayTasksArray();
 
@@ -266,6 +271,8 @@ const displayController = (() => {
         completeTab = false;
         projectTab = false;
 
+        removeActiveClass();
+        navButtons[2].classList.add('active');
         taskManager.updateAllArrays();
         const thisWeekTasksArray = taskManager.getThisWeekTasksArray();
 
@@ -282,6 +289,8 @@ const displayController = (() => {
         thisWeekTab = false;
         projectTab = false;
 
+        removeActiveClass();
+        navButtons[3].classList.add('active');
         taskManager.updateAllArrays();
         const completeTasksArray = taskManager.getCompleteTasksArray();
 
@@ -297,23 +306,23 @@ const displayController = (() => {
         inboxTab = false;
         thisWeekTab = false;
         completeTab = false;
+        
+        const projectTabs = document.querySelectorAll('.project-tab');
+        console.log(projectTabs);
+
+        if (projectTabs.length > 0) {
+
+            removeActiveClass();
+            projectTabs[projectNameIndex].classList.add('active');
+
+        }
 
         taskManager.updateAllArrays();
         const projectNameList = projectManager.getEachProjectName();
         const projectName = projectNameList[projectNameIndex];
 
-        if (projectName) {
-
-            taskDisplayHeading.textContent = projectName;
-            renderTasksDisplay(projectTasksArray, completeTab);
-
-        } else {
-
-            removeTasksDisplay();
-
-        }
-
-       
+        taskDisplayHeading.textContent = projectName;
+        renderTasksDisplay(projectTasksArray, completeTab);
 
     }
 
@@ -337,14 +346,27 @@ const displayController = (() => {
 
     const isProjectTab = () => projectTab;
 
-    function removeTasksDisplay () {
+    // function removeTasksDisplay () {
 
-        tasksContainer.textContent = "";
-        taskDisplayHeading.textContent = "";
+    //     tasksContainer.textContent = "";
+    //     taskDisplayHeading.textContent = "";
 
+    // }
+
+    function removeActiveClass () {
+
+        const projectTabs = document.querySelectorAll('.project-tab');
+        navButtons.forEach(nav => nav.classList.remove('active'));
+
+        if (projectTabs) {
+
+            projectTabs.forEach(tab => tab.classList.remove('active'));
+
+        }
+        
     }
 
-    return { renderTasksDisplay, updateInboxTasksDisplay, updateThisWeekTasksDisplay, updateTodayTasksDisplay, updateCompleteTasksDisplay, checkRenderingCondition, renderProjectsDisplay, updateProjectSelections, updateProjectTaskDisplays, isProjectTab, renderTaskDetails, removeTasksDisplay };
+    return { renderTasksDisplay, updateInboxTasksDisplay, updateThisWeekTasksDisplay, updateTodayTasksDisplay, updateCompleteTasksDisplay, checkRenderingCondition, renderProjectsDisplay, updateProjectSelections, updateProjectTaskDisplays, isProjectTab, renderTaskDetails };
 
 })();
 
