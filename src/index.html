@@ -11,14 +11,14 @@
 <body>
 
   <header>
-    <div class="logo">ToDoList</div>
+    <div class="logo-container"><i class="fa-solid fa-check-double logo"></i><div class="logo-text">ToDoList</div></div>
   </header>
 
   <nav class="nav-bar">
-    <div class="nav-button inbox">Inbox</div>
-    <div class="nav-button today">Today</div>
-    <div class="nav-button this-week">This week</div>
-    <div class="nav-button complete">Completed</div>
+    <div class="nav-button inbox active"><i class="fa-solid fa-inbox nav-icon"></i>   <div class="nav-text">Inbox</div></div>
+    <div class="nav-button today"><i class="fa-solid fa-calendar-day nav-icon"></i><div class="nav-text">Today</div></div>
+    <div class="nav-button this-week"><i class="fa-solid fa-calendar-week nav-icon"></i><div class="nav-text">This week</div></div>
+    <div class="nav-button complete"><i class="fa-solid fa-check nav-icon"></i><div class="nav-text">Completed</div></div>
     <div class="project-heading">
       <h2>Projects</h2>
       <button class="add-project-button">+</button>
@@ -29,17 +29,21 @@
   </nav>
 
   <dialog class="task-dialog">
+    <i class="fa-solid fa-xmark task-close-button"></i>
+    <div class="task-dialog-heading"></div>
     <form action="" class="task-form">
-      <a href="#" class="close-dialog-button"></a>
       <div class="question-group">
-        <input type="text" name="title" placeholder="Title: Grocery" class="task-title-input task-input-field">
+        <label for="title">Title</label>
+        <input type="text" name="title"  class="task-title-input task-input-field" id="title">
       </div>
       <div class="question-group">
-        <input type="text" name="description" placeholder="Details: e.g. apple, milk, cucumber"
-          class="task-description-input task-input-field">
+        <label for="description">Description</label>
+        <textarea name="description" id="description" cols="30" rows="10" 
+        class="task-description-input task-input-field"></textarea>
       </div>
       <div class="question-group">
-        <label for="date">Due Date:</label><input type="date" id="date" name="date" class="due-date-input task-input-field">
+        <label for="date">Due Date</label><input type="date" id="date" name="date"
+          class="due-date-input task-input-field">
       </div>
       <div class="question-group">
         <label for="priority">Priority</label>
@@ -60,8 +64,10 @@
   </dialog>
 
   <dialog class="project-dialog">
+    <i class="fa-solid fa-xmark project-close-button"></i>
+    <div class="project-dialog-heading"></div>
     <form action="" class="project-form">
-      <input type="text" name="project" placeholder="Project Name" class="project-name-input">
+      <div class="question-group"><label for="project-name-input">Title</label><input type="text" name="project" class="project-name-input" id="project-name-input"></div>
       <input type="submit" class="project-submit-button">
     </form>
   </dialog>

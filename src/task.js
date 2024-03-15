@@ -1,4 +1,5 @@
 import * as dateFns from "date-fns";
+import { localStorageManager } from "./localStorage";
 
 export const taskManager = (() => {
 
@@ -53,8 +54,6 @@ export const taskManager = (() => {
 
         }
 
-        console.log(inboxTasksArray);
-
     };
 
     const getInboxTasks = () => inboxTasksArray.filter(task => task.projectIndex == 0);
@@ -89,6 +88,8 @@ export const taskManager = (() => {
 
     }
 
+    const getInboxTasksArray = () => inboxTasksArray;
+
     const getTodayTasksArray = () => todayTasksArray;
 
     const getThisWeekTasksArray = () => thisWeekTasksArray;
@@ -97,7 +98,12 @@ export const taskManager = (() => {
 
     const getProjectTasksArray = (projectIndex) => inboxTasksArray.filter(task => task.projectIndex == projectIndex);
 
-    const addTaskItemToArray = (task) => inboxTasksArray.push(task);
+    const addTaskItemToArray = (task) =>  {
+
+        inboxTasksArray.push(task);
+        localStorageManager.saveTasksArrayToLocalStorage(inboxTasksArray);
+
+    } 
 
     const toggleTaskCompleteStatus = function (taskElement) {
 
@@ -105,6 +111,8 @@ export const taskManager = (() => {
         const isComplete = inboxTasksArray[taskObjectIndex].complete
 
         inboxTasksArray[taskObjectIndex].complete = isComplete ? false : true ;
+
+        localStorageManager.saveTasksArrayToLocalStorage(inboxTasksArray);
 
     } 
 
@@ -118,9 +126,16 @@ export const taskManager = (() => {
 
         }
 
+        localStorageManager.saveTasksArrayToLocalStorage(inboxTasksArray);
+
     });
 
-    const deleteTaskByTaskIndex = (taskIndex) => inboxTasksArray.splice(taskIndex, 1);
+    const deleteTaskByTaskIndex = (taskIndex) =>  {
+
+        inboxTasksArray.splice(taskIndex, 1);
+        localStorageManager.saveTasksArrayToLocalStorage(inboxTasksArray);
+
+    } 
 
     const getTaskProjectIndex = (taskIndex) => inboxTasksArray[taskIndex].projectIndex;
 
@@ -132,53 +147,12 @@ export const taskManager = (() => {
 
         const taskIndex = inboxTasksArray.findIndex(task => task.edit);
         inboxTasksArray[taskIndex] = newTaskObject;
+        localStorageManager.saveTasksArrayToLocalStorage(inboxTasksArray);
 
     }
 
-    return { createTaskItem, updateAllArrays, getInboxTasks, addTaskItemToArray, getTodayTasksArray, getThisWeekTasksArray, toggleTaskCompleteStatus, getCompleteTasksArray, getProjectTasksArray, getTaskDetails, deleteTasksByProjectIndex, getTaskEditDetails, getTaskProjectIndex, setTaskToEditMode, getTaskObjectInEditMode, updateTaskDetails, deleteTaskByTaskIndex };
+    const updateIndoxTasksArray = (storedArray) => inboxTasksArray = storedArray;
+
+    return { createTaskItem, updateAllArrays, getInboxTasks, addTaskItemToArray, getTodayTasksArray, getThisWeekTasksArray, toggleTaskCompleteStatus, getCompleteTasksArray, getProjectTasksArray, getTaskDetails, deleteTasksByProjectIndex, getTaskEditDetails, getTaskProjectIndex, setTaskToEditMode, getTaskObjectInEditMode, updateTaskDetails, deleteTaskByTaskIndex, getInboxTasksArray, updateIndoxTasksArray };
     
 })();
-
-//create an inbox array and push the task item into the array
-
-// export const taskManager = (() => {
-
-//     let inboxTasksArray = [];
-//     let todayTasksArray = [];
-//     let thisWeekTasksArray= [];
-
-//     const createTaskItem = function (title, description, dueDate, priority) {
-
-//         const formattedDueDate = dateFns.format(dueDate, 'dd MMMM yyyy');
-
-//         return { title, description, formattedDueDate, priority, complete: false };
-//     }
-
-//     const createTodayTasksArray = function () {
-        
-//         todayTasksArray = inboxTasksArray.filter((task) => task.formattedDueDate === dateFns.format(new Date(), 'dd MMMM yyyy'))
-
-//     };
-
-//     const createThisWeekTasksArray = function (array) {
-
-//         const seventhDay = new Date ();
-//         seventhDay.setDate(seventhDay.getDate() + 7);
-
-//         thisWeekTasksArray = inboxTasksArray.filter((task) => new Date (task.formattedDueDate).getDate() <= seventhDay.getDate());
-
-//         console.log(thisWeekTasksArray);
-
-//     }
-
-//     const getInboxTaskArray = () => inboxTasksArray;
-
-//     const getTodayTasksArray = () => todayTasksArray;
-
-//     const getThisWeekTasksArray = () => thisWeekTasksArray;
-
-//     const addTaskItemToArray = (task) => inboxTasksArray.push(task);
-
-//     return { createTaskItem, createTodayTasksArray, createThisWeekTasksArray, getInboxTaskArray, addTaskItemToArray, getTodayTasksArray, getThisWeekTasksArray  };
-
-// })();

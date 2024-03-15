@@ -1,11 +1,4 @@
-import { taskManager } from "./task";
-
-//function for getting each project name
-//for loop and push each pj name into an array
-//function for getting the name array
-// => so user can select project where the task goes to
-//function to assign task object to corresponding project tasks array after receiving user input
-//function 
+import { localStorageManager } from "./localStorage";
 
 export const projectManager = (() => {
 
@@ -23,7 +16,12 @@ export const projectManager = (() => {
 
     }
 
-    const addProjectObjectToArray = (project) => projectsArray.push(project);
+    const addProjectObjectToArray = (project) => {
+        
+        projectsArray.push(project);
+        localStorageManager.saveProjectsArrayToLocalStorage(projectsArray);
+
+    };
 
     const getProjectArray = () => projectsArray;
 
@@ -42,12 +40,23 @@ export const projectManager = (() => {
         const projectObjectInEditMode = projectsArray.find(project => project.edit)
         projectObjectInEditMode.name = NewprojectName;
         projectObjectInEditMode.edit = false;
+        localStorageManager.saveProjectsArrayToLocalStorage(projectsArray);
 
     }
 
-    const deleteProjectByProjectIndex = (projectIndex) => projectsArray.splice(projectIndex - 1, 1);
+    const deleteProjectByProjectIndex = (projectIndex) => {
 
-    return {createProjectObject, getProjectArray, addProjectObjectToArray, getEachProjectName, getProjectNameIndex, getProjectNameByProjectIndex, setProjectObjectToEditMode, setNewProjectName, deleteProjectByProjectIndex, getEditModeProjectIndex};
+        projectsArray.splice(projectIndex - 1, 1);
+        localStorageManager.saveProjectsArrayToLocalStorage(projectsArray);
+
+    } 
+
+    const getProjectObjectInEditMode = () => projectsArray.find(project => project.edit);
+
+    const updateProjectsArray = (storedArray) => projectsArray = storedArray;
+
+
+    return {createProjectObject, getProjectArray, addProjectObjectToArray, getEachProjectName, getProjectNameIndex, getProjectNameByProjectIndex, setProjectObjectToEditMode, setNewProjectName, deleteProjectByProjectIndex, getEditModeProjectIndex, getProjectObjectInEditMode, updateProjectsArray};
 
 })();
 

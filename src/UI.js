@@ -1,11 +1,7 @@
 import './styles.css';
 import { taskManager } from './task';
 import { projectManager } from './project';
-
-//**AFTER complete project manager function logics */
-//function for creating options element and pushing project tab name into each element(for loop)
-//submit taskdialog, use projectManager to assign the task to the corresponding project tasks array
-//
+import { localStorageManager } from './localStorage';
 
 const domElementsCreator = (() => {
 
@@ -13,6 +9,7 @@ const domElementsCreator = (() => {
 
         const elementsToBeDisplayed = [];
         const taskCheckButtonClassList = ['fa-regular', 'fa-circle', 'task-check-button'];
+        const taskCheckedButtonClassList = ['fa-regular', 'fa-circle-check', 'task-check-button'];
         const taskEditButtonClassList = ['fa-regular', 'fa-pen-to-square', 'task-edit-button'];
         const taskDeleteButtonClassList = ['fa-regular', 'fa-trash-can', 'task-delete-button'];
 
@@ -34,12 +31,31 @@ const domElementsCreator = (() => {
             const taskEditButton = document.createElement('i');
             const taskDeleteButton = document.createElement('i');
 
-            taskCheckButton.classList.add(...taskCheckButtonClassList);
+            if (completeTab) {
+                taskCheckButton.classList.add(...taskCheckedButtonClassList);
+            } else {
+                taskCheckButton.classList.add(...taskCheckButtonClassList);
+            }
+            
             taskTitleDiv.classList.add('task-title');
             taskDueDateDiv.classList.add('task-date');
             taskEditButton.classList.add(...taskEditButtonClassList);
             taskDeleteButton.classList.add(...taskDeleteButtonClassList);
             taskItem.classList.add('task-item');
+
+            if (taskPriority === "low") {
+
+                taskItem.classList.add('low-priority');
+
+            } else if (taskPriority === "medium") {
+
+                taskItem.classList.add('medium-priority');
+
+            } else {
+
+                taskItem.classList.add('high-priority');
+
+            }
 
             taskTitleDiv.textContent = taskTitle;
             taskDueDateDiv.textContent = taskDueDate;
@@ -387,6 +403,12 @@ const displayController = (() => {
     const navBar = document.querySelector('.nav-bar');
     const projectNameSelect = document.querySelector('.project-name-select');
     const projectNameInput = document.querySelector('.project-name-input');
+    const taskSubmitButton = document.querySelector('.task-submit-button');
+    const taskDialogHeading = document.querySelector('.task-dialog-heading');
+    const projectSubmitButton = document.querySelector('.project-submit-button');
+    const projectDialogHeading = document.querySelector('.project-dialog-heading');
+    const taskDialogCloseButton = document.querySelector('.task-close-button');
+    const projectDialogCloseButton = document.querySelector('.project-close-button');
     let projectEditMode = false;
     let taskEditMode = false;
 
@@ -394,13 +416,47 @@ const displayController = (() => {
     addTaskButton.addEventListener('click', () => {
 
         addTaskDialog.showModal();
+        taskDialogHeading.textContent = 'Add Task';
+        taskSubmitButton.value = 'Add Task';
 
     });
 
     addProjectButton.addEventListener('click', () => {
 
         addProjectDialog.showModal();
+        projectDialogHeading.textContent = 'Add Project';
+        projectSubmitButton.value = 'Add Project';
 
+    })
+
+    taskDialogCloseButton.addEventListener('click', () => {
+
+        if (taskEditMode) {
+            
+            const taskObjectInEditMode = taskManager.getTaskObjectInEditMode();
+            taskObjectInEditMode.edit = false;
+            taskEditMode = false;
+            
+        }
+
+        addTaskDialog.close();
+        taskForm.reset();
+
+    })
+
+    projectDialogCloseButton.addEventListener('click', () => {
+
+        if (projectEditMode) {
+
+            const projectObjectInEditMode = projectManager.getProjectObjectInEditMode();
+            projectObjectInEditMode.edit = false;
+            projectEditMode = false;
+
+        }
+
+        addProjectDialog.close();
+        projectForm.reset();
+        
     })
 
     projectForm.addEventListener('submit', event => {
@@ -410,15 +466,6 @@ const displayController = (() => {
         if (projectEditMode) {
 
             const newProjectName = projectNameInput.value;
-            // const activeProjectTab = document.querySelector('.active');
-            // let activeProjectTabInbex 
-
-            // if (activeProjectTab) {
-
-            //     activeProjectTabInbex = activeProjectTab.dataset.number;
-
-            // }
-
             let editModeProjectTabIndex = projectManager.getEditModeProjectIndex();
 
             projectManager.setNewProjectName(newProjectName);
@@ -554,6 +601,8 @@ const displayController = (() => {
             addTaskDialog.showModal();
             taskEditMode = true;
 
+            taskDialogHeading.textContent = "Edit Task";
+            taskSubmitButton.value = "Edit Task";
             const taskIndex = taskItem.dataset.number;
             taskManager.setTaskToEditMode(taskIndex);
             const taskInputFieldsList = document.querySelectorAll('.task-input-field');
@@ -631,6 +680,8 @@ const displayController = (() => {
             addProjectDialog.showModal();
             projectEditMode = true;
 
+            projectDialogHeading.textContent = 'Edit Project';
+            projectSubmitButton.value = 'Edit Project';
             const projectTab = target.parentElement;
             const projectIndex = projectTab.dataset.number;
             projectManager.setProjectObjectToEditMode(projectIndex)
@@ -655,11 +706,6 @@ const displayController = (() => {
 
             displayController.renderProjectsDisplay(newProjectsArray);
             
-
-            //if projectTabMode and target tab active => check rendering 
-            // if projectTabMobe and target tab not active => no need rendering 
-            
-
             displayController.updateInboxTasksDisplay();
             return;
 
@@ -721,3 +767,50 @@ const displayController = (() => {
 
 })();
 
+(function () {
+
+    if (!localStorage.getItem('inboxTasksArray')) {
+
+        displayDefaultTasks();
+
+    } else {
+
+        const inboxTasksArray = localStorageManager.loadTasksArrayFromLocalStorage();
+        const projectsArray = localStorageManager.loadProjectsArrayFromLocalStorage();
+        taskManager.updateIndoxTasksArray(inboxTasksArray);
+        projectManager.updateProjectsArray(projectsArray);
+        displayController.renderProjectsDisplay(projectsArray);
+        displayController.updateProjectSelections();
+        displayController.updateInboxTasksDisplay();
+
+    }
+
+
+    function displayDefaultTasks () {
+
+        const seventhDay = new Date();
+        seventhDay.setDate(seventhDay.getDate() + 7);
+
+        const sampleProject = projectManager.createProjectObject('The Most Amazing Project');
+        const sampleTaskOne = taskManager.createTaskItem('Feed Cat', 'Remember to let it drink enough water', new Date(), 'low', 'Inbox', 0);
+        const sampleTaskTwo = taskManager.createTaskItem('Do Leetcode Ex', 'Make notes after completing the exercise', seventhDay, 'medium', 'Inbox', 0);
+        const sampleTaskThree = taskManager.createTaskItem('Be The Best Self Everyday', 'You Are Awesome!!', '', 'high', 'The Most Amazing Project', 1);
+        
+        
+        
+        taskManager.addTaskItemToArray(sampleTaskOne);
+        taskManager.addTaskItemToArray(sampleTaskTwo);
+        taskManager.addTaskItemToArray(sampleTaskThree);
+        
+        projectManager.addProjectObjectToArray(sampleProject);
+        
+        const newProjectsArray = projectManager.getProjectArray();
+        displayController.renderProjectsDisplay(newProjectsArray);
+        
+        displayController.updateProjectSelections();
+        displayController.updateInboxTasksDisplay();
+
+    }
+
+    
+})();
