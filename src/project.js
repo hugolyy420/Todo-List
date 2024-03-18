@@ -1,62 +1,68 @@
 import { localStorageManager } from "./localStorage";
 
+// eslint-disable-next-line import/prefer-default-export
 export const projectManager = (() => {
+  let projectsArray = [];
 
-    let projectsArray = [];
-
-    const createProjectObject = function (projectName) {
-
-        const projectObject = {
-
-            name : projectName,
-            edit : false
-
-        }
-        return projectObject;
-
-    }
-
-    const addProjectObjectToArray = (project) => {
-        
-        projectsArray.push(project);
-        localStorageManager.saveProjectsArrayToLocalStorage(projectsArray);
-
+  const createProjectObject = function (projectName) {
+    const projectObject = {
+      name: projectName,
+      edit: false,
     };
+    return projectObject;
+  };
 
-    const getProjectArray = () => projectsArray;
+  const addProjectObjectToArray = (project) => {
+    projectsArray.push(project);
+    localStorageManager.saveProjectsArrayToLocalStorage(projectsArray);
+  };
 
-    const getEachProjectName = () => projectsArray.map(project => project.name);
+  const getProjectArray = () => projectsArray;
 
-    const getProjectNameByProjectIndex = (projectIndex) => projectsArray[projectIndex - 1].name;
+  const getEachProjectName = () => projectsArray.map((project) => project.name);
 
-    const getProjectNameIndex = (index) => index - 1;
+  const getProjectNameByProjectIndex = (projectIndex) =>
+    projectsArray[projectIndex - 1].name;
 
-    const getEditModeProjectIndex = () => projectsArray.findIndex(project => project.edit) + 1;
+  const getProjectNameIndex = (index) => index - 1;
 
-    const setProjectObjectToEditMode = (projectIndex) => projectsArray[projectIndex - 1].edit = true;
+  const getEditModeProjectIndex = () =>
+    projectsArray.findIndex((project) => project.edit) + 1;
 
-    const setNewProjectName = function (NewprojectName) {
+  const setProjectObjectToEditMode = (projectIndex) =>
+    (projectsArray[projectIndex - 1].edit = true);
 
-        const projectObjectInEditMode = projectsArray.find(project => project.edit)
-        projectObjectInEditMode.name = NewprojectName;
-        projectObjectInEditMode.edit = false;
-        localStorageManager.saveProjectsArrayToLocalStorage(projectsArray);
+  const setNewProjectName = function (NewprojectName) {
+    const projectObjectInEditMode = projectsArray.find(
+      (project) => project.edit,
+    );
+    projectObjectInEditMode.name = NewprojectName;
+    projectObjectInEditMode.edit = false;
+    localStorageManager.saveProjectsArrayToLocalStorage(projectsArray);
+  };
 
-    }
+  const deleteProjectByProjectIndex = (projectIndex) => {
+    projectsArray.splice(projectIndex - 1, 1);
+    localStorageManager.saveProjectsArrayToLocalStorage(projectsArray);
+  };
 
-    const deleteProjectByProjectIndex = (projectIndex) => {
+  const getProjectObjectInEditMode = () =>
+    projectsArray.find((project) => project.edit);
 
-        projectsArray.splice(projectIndex - 1, 1);
-        localStorageManager.saveProjectsArrayToLocalStorage(projectsArray);
+  const updateProjectsArray = (storedArray) => (projectsArray = storedArray);
 
-    } 
-
-    const getProjectObjectInEditMode = () => projectsArray.find(project => project.edit);
-
-    const updateProjectsArray = (storedArray) => projectsArray = storedArray;
-
-
-    return {createProjectObject, getProjectArray, addProjectObjectToArray, getEachProjectName, getProjectNameIndex, getProjectNameByProjectIndex, setProjectObjectToEditMode, setNewProjectName, deleteProjectByProjectIndex, getEditModeProjectIndex, getProjectObjectInEditMode, updateProjectsArray};
-
+  return {
+    createProjectObject,
+    getProjectArray,
+    addProjectObjectToArray,
+    getEachProjectName,
+    getProjectNameIndex,
+    getProjectNameByProjectIndex,
+    setProjectObjectToEditMode,
+    setNewProjectName,
+    deleteProjectByProjectIndex,
+    getEditModeProjectIndex,
+    getProjectObjectInEditMode,
+    updateProjectsArray,
+  };
 })();
-
